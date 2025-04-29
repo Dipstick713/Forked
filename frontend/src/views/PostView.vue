@@ -4,7 +4,7 @@
       <div class="w-full max-w-[600px] border-x border-neutral-800 min-h-screen">
         <!-- Post Header -->
         <div class="sticky top-0 z-10 bg-[#0e0f10]/90 backdrop-blur-sm p-4 border-b border-neutral-800 flex items-center gap-4">
-          <button class="rounded-full p-2 hover:bg-neutral-800">
+          <button @click="$router.back()" class="rounded-full p-2 hover:bg-neutral-800">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
