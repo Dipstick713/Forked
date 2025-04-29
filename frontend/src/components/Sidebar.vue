@@ -39,7 +39,7 @@ const logout = () => {
   <Users class="mx-4"/>
   Following
 </RouterLink>
-        <a href="#" class="flex w-37 space-y-5 hover:text-white rounded-full h-12 items-center hover:bg-zinc-800 transition-colors duration-200"> <User class="mx-4"/>Profile</a>
+        <RouterLink to="/user" class="flex w-37 space-y-5 hover:text-white rounded-full h-12 items-center hover:bg-zinc-800 transition-colors duration-200"> <User class="mx-4"/>Profile</RouterLink>
       </nav>
     </div>
 
