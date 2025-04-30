@@ -23,7 +23,7 @@ const logout = () => {
         Forked</h2>
       <nav class="space-y-12 pt-30 text-xl text-neutral-300">
         <RouterLink to="/" class="flex w-35 space-y-5 hover:text-white rounded-full h-12 items-center hover:bg-zinc-800 transition-colors duration-200"><House class="mx-4"/>Home</RouterLink>
-        <a href="#" class="flex w-46 space-y-5 hover:text-white rounded-full h-12 items-center hover:bg-zinc-800 transition-colors duration-200"><FolderGit2 class="mx-4"/>New Posts</a>
+        <RouterLink to="/user/newpost" class="flex w-46 space-y-5 hover:text-white rounded-full h-12 items-center hover:bg-zinc-800 transition-colors duration-200"><FolderGit2 class="mx-4"/>New Posts</RouterLink>
         <RouterLink 
   to="/user/followers" 
   class="flex w-45 space-y-5 hover:text-white rounded-full h-12 items-center hover:bg-zinc-800 transition-colors duration-200"
