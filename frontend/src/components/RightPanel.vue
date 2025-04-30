@@ -1,3 +1,7 @@
+<script setup lang="ts">
+import SearchBar from './SearchBar.vue';
+</script>
+
 <template>
     <aside class="w-80 p-4 border-l border-[#253446]">
       <div class="bg-gradient-to-br from-green-400/100 to-yellow-400/100 p-4 rounded-lg mb-6">
@@ -7,7 +11,7 @@
           Create Post
         </button>
       </div>
-  
+      <SearchBar/>
     </aside>
   </template>
   
