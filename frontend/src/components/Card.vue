@@ -21,7 +21,7 @@
           <div v-if="isCurrentUserPost" class="ml-auto relative">
             <button 
               @click="showDropdown = !showDropdown"
-              class="text-neutral-500 hover:text-white p-2 rounded-full hover:bg-neutral-800"
+              class="text-neutral-500 hover:text-white rounded-full hover:bg-neutral-800"
             >
               <Ellipsis/> 
             </button>

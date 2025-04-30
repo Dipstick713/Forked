@@ -65,7 +65,7 @@ watch(searchQuery, (newQuery) => {
 <template>
   <div class="relative w-full max-w-lg mx-auto">
     <!-- Search Input -->
-    <div class="relative">
+    <div class="relative ">
       <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
         <Search class="h-5 w-5 text-neutral-500" />
       </div>
@@ -75,7 +75,7 @@ watch(searchQuery, (newQuery) => {
         @blur="setTimeout(() => isFocused = false, 200)"
         type="text"
         placeholder="Search users..."
-        class="block w-full pl-10 pr-12 py-2 bg-neutral-900 border border-neutral-800 rounded-full text-white placeholder-neutral-500 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500 transition"
+        class="block w-full pl-10 pr-12 py-2 bg-[#15181b] border border-[#494b5e] rounded-full text-white placeholder-neutral-500 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500 transition"
       >
       <button
         v-if="searchQuery"
@@ -89,7 +89,7 @@ watch(searchQuery, (newQuery) => {
     <!-- Search Results Dropdown -->
     <div
       v-if="isFocused && (searchQuery || searchResults.length)"
-      class="absolute z-10 mt-2 w-full bg-neutral-900 border border-neutral-800 rounded-xl shadow-lg overflow-hidden"
+      class="absolute z-10 mt-2 w-full bg-[#15181b] border border-neutral-800 rounded-xl shadow-lg overflow-hidden"
     >
       <!-- Loading State -->
       <div v-if="isLoading" class="p-4 text-center text-neutral-500">
@@ -106,7 +106,7 @@ watch(searchQuery, (newQuery) => {
         <li
           v-for="user in searchResults"
           :key="user.id"
-          class="p-3 hover:bg-neutral-800/50 transition cursor-pointer"
+          class="p-3 hover:bg-[#1e2124] transition cursor-pointer"
         >
           <div class="flex items-center space-x-3">
             <img
@@ -117,11 +117,6 @@ watch(searchQuery, (newQuery) => {
             <div class="flex-1 min-w-0">
               <div class="flex items-center space-x-1">
                 <p class="font-medium text-white truncate">{{ user.name }}</p>
-                <span v-if="user.verified" class="text-green-500">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
-                  </svg>
-                </span>
               </div>
               <p class="text-sm text-neutral-500 truncate">@{{ user.handle }}</p>
               <p v-if="user.bio" class="text-sm text-neutral-400 mt-1 truncate">{{ user.bio }}</p>
