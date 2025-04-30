@@ -8,7 +8,6 @@ type User = {
   handle: string
   avatar: string
   bio?: string
-  verified?: boolean
 }
 
 const searchQuery = ref('')
@@ -36,7 +35,6 @@ const searchUsers = async (query: string) => {
       handle: 'johndoe',
       avatar: 'https://randomuser.me/api/portraits/men/1.jpg',
       bio: 'Digital creator | Coffee enthusiast',
-      verified: true
     },
     {
       id: '2',
