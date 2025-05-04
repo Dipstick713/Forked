@@ -117,13 +117,3 @@ const createPost = async () => {
     <RightPanel/>
   </div>
 </template>
-
-<style scoped>
-textarea {
-  scrollbar-width: none; /* Firefox */
-}
-textarea::-webkit-scrollbar {
-  display: none; /* Chrome/Safari */
-}
-</style>
-

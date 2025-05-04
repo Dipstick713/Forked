@@ -17,7 +17,7 @@ const logout = () => {
 
 <template>
   <aside class="w-80 p-6 flex flex-col justify-between border-r border-[#253344]">
-    <div class="font-roboto">
+    <div>
       <h2 class="flex text-2xl font-bold h-25">
         <GitFork class="mx-2"/>
         Forked</h2>
