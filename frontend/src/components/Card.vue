@@ -93,6 +93,13 @@
             <span class="text-sm">{{ post.stats.likes }}</span>
           </button>
 
+          <button class="flex items-center gap-1 hover:text-yellow-500 group">
+            <div class="p-2 rounded-full group-hover:bg-yellow-500/10">
+              <FolderTree class="size-5"/>
+            </div>
+            <span class="text-sm">{{ post.stats.reposts }}</span>
+          </button>
+
           <!-- Share -->
           <button class="flex items-center gap-1 hover:text-blue-400 group">
             <div class="p-2 rounded-full group-hover:bg-blue-400/10">
@@ -113,7 +120,8 @@ import {
   Share, 
   Ellipsis,
   Trash2,
-  Flag
+  Flag,
+  FolderTree
 } from 'lucide-vue-next';
 import { ref } from 'vue';
 
