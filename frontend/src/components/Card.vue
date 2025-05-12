@@ -4,21 +4,23 @@
       <!-- Avatar -->
       <img 
         :src="post.user.avatar" 
-        class="w-12 h-12 rounded-full object-cover border border-neutral-700"
+        class="w-12 h-12 rounded-full object-cover border border-neutral-700 flex-shrink-0"
         alt="User avatar"
       >
 
       <!-- Content -->
-      <div class="flex-1">
+      <div class="flex-1 min-w-0">
         <!-- Header -->
         <div class="flex items-center gap-1 text-sm">
-          <span class="font-bold text-white">{{ post.user.name }}</span>
-          <span class="text-neutral-500">@{{ post.user.handle }}</span>
-          <span class="text-neutral-500">·</span>
-          <span class="text-neutral-500">{{ post.time }}</span>
+          <div class="flex items-baseline min-w-0 max-w-[calc(100%-40px)]">
+            <span class="font-bold text-white truncate max-w-[120px]">{{ post.user.name }}</span>
+            <span class="text-neutral-500 truncate ml-1">@{{ post.user.handle }}</span>
+          </div>
+          <span class="text-neutral-500 flex-shrink-0">·</span>
+          <span class="text-neutral-500 whitespace-nowrap flex-shrink-0">{{ post.time }}</span>
           
           <!-- Ellipsis Dropdown -->
-          <div class="ml-auto relative">
+          <div class="ml-auto relative flex-shrink-0">
             <button 
               @click="showDropdown = !showDropdown"
               class="text-neutral-500 hover:text-white p-2 rounded-full hover:bg-neutral-800"
@@ -130,16 +132,16 @@ const props = defineProps({
     type: Object,
     required: true,
     default: () => ({
-      id: '1', // Added post ID for deletion
+      id: '1',
       user: {
-        id: '1', // Added user ID
+        id: '1',
         name: 'John Doe',
         handle: 'johndoe',
         avatar: 'https://randomuser.me/api/portraits/men/1.jpg'
       },
       content: 'This is a sample post content that shows how the card will look with some text in it.',
       time: '2h ago',
-      image: '', // Optional image URL
+      image: '',
       liked: false,
       stats: {
         replies: 24,
@@ -150,15 +152,13 @@ const props = defineProps({
   },
   currentUserId: {
     type: String,
-    default: '1' // This should come from your auth store
+    default: '1'
   }
 });
 
 const emit = defineEmits(['delete']);
 
 const showDropdown = ref(false);
-
-// Check if current user is the post author
 const isCurrentUserPost = props.post.user.id === props.currentUserId;
 
 const deletePost = () => {
