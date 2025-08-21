@@ -1,40 +1,44 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
-const { configDotenv, config } = require('dotenv');
+const session = require('express-session');
+const connectDB = require('./config/database');
 require('dotenv').config({ path: './backend/.env' });
+
 const app = express();
 const PORT = process.env.PORT || 3000;
-const session = require('express-session');
-const passport = require('./passport');
+
+// Import routes and passport
 const authRoutes = require('./routes/auth');
+const passport = require('./passport');
+
+// Connect to database
+connectDB();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
 app.use(express.json());
 app.use(session({
   secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: true } // Set to true if using HTTPS
+  cookie: {
+    secure: false,
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+  }
 }));
 app.use(passport.initialize());
 app.use(passport.session());
 
-//MongoDB connection
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('Connected to MongoDB'))
-  .catch((err) => console.error('MongoDB connection error:', err));
-
-// Sample route
-app.get('/', (req, res) => {
-  res.send('Forked API is running');
-});
-
 // Routes
-//const threadRoutes = require('./routes/threads');
-//app.use('/api/threads', threadRoutes);
 app.use('/auth', authRoutes);
+
+// Health check route
+app.get('/api/health', (req, res) => {
+  res.json({ message: 'Forked API is running', status: 'OK' });
+});
 
 // Start server
 app.listen(PORT, () => {
