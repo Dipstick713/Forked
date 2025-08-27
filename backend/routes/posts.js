@@ -1,0 +1,128 @@
+const express = require('express');
+const Post = require('../models/Post');
+const Like = require('../models/Like');
+const router = express.Router();
+
+// Get all posts (with optional pagination)
+router.get('/', async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+
+    const posts = await Post.find()
+      .populate('author', 'username displayName avatarUrl')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    res.json(posts);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Get a specific post with its thread
+router.get('/:id', async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id)
+      .populate('author', 'username displayName avatarUrl')
+      .populate('parent')
+      .populate('branches');
+
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+
+    res.json(post);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Create a new post
+router.post('/', async (req, res) => {
+  try {
+    const { content, parentId, image } = req.body;
+
+    const postData = {
+      content,
+      author: req.user._id,
+      image
+    };
+
+    if (parentId) {
+      const parentPost = await Post.findById(parentId);
+      if (!parentPost) {
+        return res.status(404).json({ message: 'Parent post not found' });
+      }
+      postData.parent = parentId;
+      postData.seed = parentPost.seed;
+    }
+
+    const post = new Post(postData);
+    const savedPost = await post.save();
+    
+    // Populate author info for immediate response
+    await savedPost.populate('author', 'username displayName avatarUrl');
+
+    res.status(201).json(savedPost);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+// Like/unlike a post
+router.put('/:id/like', async (req, res) => {
+  try {
+    const { action } = req.body;
+    const postId = req.params.id;
+    const userId = req.user._id;
+
+    if (action === 'like') {
+      // Check if already liked
+      const existingLike = await Like.findOne({ user: userId, post: postId });
+      if (existingLike) {
+        return res.status(400).json({ message: 'Post already liked' });
+      }
+
+      const like = new Like({ user: userId, post: postId });
+      await like.save();
+    } else if (action === 'unlike') {
+      await Like.findOneAndDelete({ user: userId, post: postId });
+    } else {
+      return res.status(400).json({ message: 'Invalid action' });
+    }
+
+    // Get updated like count
+    const likeCount = await Like.countDocuments({ post: postId });
+    await Post.findByIdAndUpdate(postId, { 'stats.likes': likeCount });
+
+    res.json({ likes: likeCount });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Delete a post
+router.delete('/:id', async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+
+    // Check if user owns the post
+    if (post.author.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Not authorized' });
+    }
+
+    await Post.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Post deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+module.exports = router;

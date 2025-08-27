@@ -9,6 +9,8 @@ const PORT = process.env.PORT || 3000;
 
 // Import routes and passport
 const authRoutes = require('./routes/auth');
+const postRoutes = require('./routes/posts');
+const userRoutes = require('./routes/users'); 
 const passport = require('./passport');
 
 // Connect to database
@@ -26,7 +28,7 @@ app.use(session({
   saveUninitialized: false,
   cookie: {
     secure: false,
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    maxAge: 24 * 60 * 60 * 1000
   }
 }));
 app.use(passport.initialize());
@@ -34,7 +36,8 @@ app.use(passport.session());
 
 // Routes
 app.use('/auth', authRoutes);
-
+app.use('/api/posts', postRoutes);
+app.use('/api/users', userRoutes);
 // Health check route
 app.get('/api/health', (req, res) => {
   res.json({ message: 'Forked API is running', status: 'OK' });
