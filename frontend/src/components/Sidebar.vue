@@ -67,7 +67,7 @@ const logout = async () => {
         <RouterLink to="/user/following" class="flex w-45 space-y-5 hover:text-white rounded-full h-12 items-center hover:bg-zinc-800 transition-colors duration-200">
           <Users class="mx-4"/>Following
         </RouterLink>
-        <RouterLink to="/user" class="flex w-37 space-y-5 hover:text-white rounded-full h-12 items-center hover:bg-zinc-800 transition-colors duration-200">
+        <RouterLink to="/user/profile" class="flex w-37 space-y-5 hover:text-white rounded-full h-12 items-center hover:bg-zinc-800 transition-colors duration-200">
           <User class="mx-4"/>Profile
         </RouterLink>
       </nav>

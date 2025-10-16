@@ -30,6 +30,11 @@ const router = createRouter({
       component: FollowView
     },
     {
+      path: '/user/profile',
+      name: 'myprofile',
+      component: ProfileView
+    },
+    {
       path: '/:user',
       name: 'profile',
       component: ProfileView
