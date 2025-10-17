@@ -6,7 +6,18 @@ const userSchema = new mongoose.Schema({
   displayName: String,
   avatarUrl: String,
   profileUrl: String,
-  email: String
+  email: String,
+  bio: String,
+  location: String,
+  website: String,
+  followersCount: {
+    type: Number,
+    default: 0
+  },
+  followingCount: {
+    type: Number,
+    default: 0
+  }
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema); 
