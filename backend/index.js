@@ -10,7 +10,9 @@ const PORT = process.env.PORT || 3000;
 // Import routes and passport
 const authRoutes = require('./routes/auth');
 const postRoutes = require('./routes/posts');
-const userRoutes = require('./routes/users'); 
+const userRoutes = require('./routes/users');
+const followRoutes = require('./routes/follows');
+const notificationRoutes = require('./routes/notifications');
 const passport = require('./passport');
 
 // Connect to database
@@ -38,6 +40,8 @@ app.use(passport.session());
 app.use('/auth', authRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/follows', followRoutes);
+app.use('/api/notifications', notificationRoutes);
 // Health check route
 app.get('/api/health', (req, res) => {
   res.json({ message: 'Forked API is running', status: 'OK' });
