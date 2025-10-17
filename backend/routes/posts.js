@@ -1,6 +1,7 @@
 const express = require('express');
 const Post = require('../models/Post');
 const Like = require('../models/Like');
+const Notification = require('../models/Notification');
 const router = express.Router();
 
 // Get all posts (with optional pagination)
@@ -66,6 +67,19 @@ router.post('/', async (req, res) => {
     // Populate author info for immediate response
     await savedPost.populate('author', 'username displayName avatarUrl');
 
+    // Create notification if it's a reply/fork
+    if (parentId) {
+      const parentPost = await Post.findById(parentId);
+      if (parentPost && parentPost.author.toString() !== req.user._id.toString()) {
+        await Notification.create({
+          recipient: parentPost.author,
+          sender: req.user._id,
+          type: parentId ? 'fork' : 'reply',
+          post: savedPost._id
+        });
+      }
+    }
+
     res.status(201).json(savedPost);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -88,6 +102,17 @@ router.put('/:id/like', async (req, res) => {
 
       const like = new Like({ user: userId, post: postId });
       await like.save();
+
+      // Create notification for the post author
+      const post = await Post.findById(postId);
+      if (post && post.author.toString() !== userId.toString()) {
+        await Notification.create({
+          recipient: post.author,
+          sender: userId,
+          type: 'like',
+          post: postId
+        });
+      }
     } else if (action === 'unlike') {
       await Like.findOneAndDelete({ user: userId, post: postId });
     } else {
