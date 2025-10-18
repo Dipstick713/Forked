@@ -58,16 +58,16 @@ const logout = async () => {
         <RouterLink to="/" class="flex w-35 space-y-5 hover:text-white rounded-full h-12 items-center hover:bg-zinc-800 transition-colors duration-200">
           <House class="mx-4"/>Home
         </RouterLink>
-        <RouterLink to="/user/newpost" class="flex w-46 space-y-5 hover:text-white rounded-full h-12 items-center hover:bg-zinc-800 transition-colors duration-200">
+        <RouterLink :to="`/${user.username}/newpost`" class="flex w-46 space-y-5 hover:text-white rounded-full h-12 items-center hover:bg-zinc-800 transition-colors duration-200">
           <FolderGit2 class="mx-4"/>New Posts
         </RouterLink>
-        <RouterLink to="/user/followers" class="flex w-45 space-y-5 hover:text-white rounded-full h-12 items-center hover:bg-zinc-800 transition-colors duration-200">
+        <RouterLink :to="`/${user.username}/followers`" class="flex w-45 space-y-5 hover:text-white rounded-full h-12 items-center hover:bg-zinc-800 transition-colors duration-200">
           <Users class="mx-4"/>Followers
         </RouterLink>
-        <RouterLink to="/user/following" class="flex w-45 space-y-5 hover:text-white rounded-full h-12 items-center hover:bg-zinc-800 transition-colors duration-200">
+        <RouterLink :to="`/${user.username}/following`" class="flex w-45 space-y-5 hover:text-white rounded-full h-12 items-center hover:bg-zinc-800 transition-colors duration-200">
           <Users class="mx-4"/>Following
         </RouterLink>
-        <RouterLink to="/user/profile" class="flex w-37 space-y-5 hover:text-white rounded-full h-12 items-center hover:bg-zinc-800 transition-colors duration-200">
+        <RouterLink :to="`/${user.username}`" class="flex w-37 space-y-5 hover:text-white rounded-full h-12 items-center hover:bg-zinc-800 transition-colors duration-200">
           <User class="mx-4"/>Profile
         </RouterLink>
       </nav>
@@ -91,7 +91,7 @@ const logout = async () => {
     <div v-else-if="user" class="flex items-center justify-between p-3 rounded-lg transition cursor-pointer">
       <div class="flex items-center space-x-3">
         <img 
-          :src="user.avatarUrl || 'https://randomuser.me/api/portraits/men/1.jpg'" 
+          :src="user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.username)}&background=random`" 
           class="w-10 h-10 rounded-full object-cover border border-neutral-600"
           :alt="user.displayName"
         >

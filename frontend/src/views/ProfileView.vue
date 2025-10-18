@@ -60,13 +60,16 @@
             <button 
               v-if="!isOwnProfile && currentUser"
               @click="toggleFollow"
+              :disabled="isFollowLoading"
               :class="{
                 'bg-white border border-black text-black': isFollowing,
-                'bg-transparent border border-neutral-600 text-white': !isFollowing
+                'bg-transparent border border-neutral-600 text-white': !isFollowing,
+                'opacity-50 cursor-not-allowed': isFollowLoading
               }"
               class="px-4 py-1.5 rounded-full font-bold hover:opacity-90 transition"
             >
-              {{ isFollowing ? 'Following' : 'Follow' }}
+              <span v-if="!isFollowLoading">{{ isFollowing ? 'Following' : 'Follow' }}</span>
+              <span v-else>Loading...</span>
             </button>
             <button 
               v-else-if="isOwnProfile"
@@ -175,12 +178,14 @@
   import PostCard from '@/components/Card.vue'
   import { userService } from '@/services/userService'
   import { authService } from '@/services/auth'
+  import { followService } from '@/services/followService'
   
   const route = useRoute()
   const activeTab = ref<string>('Posts')
   const tabs = ['Posts', 'Likes']
   const isFollowing = ref(false)
   const isLoading = ref(true)
+  const isFollowLoading = ref(false)
   const error = ref<string | null>(null)
   const currentUser = ref<any>(null)
   
@@ -188,8 +193,8 @@
     _id: '',
     name: '',
     handle: '',
-    avatar: 'https://randomuser.me/api/portraits/men/1.jpg',
-    coverPhoto: 'https://images.unsplash.com/photo-1579547945413-497e1b99dac0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
+    avatar: '',
+    coverPhoto: '',
     bio: '',
     location: '',
     website: '',
@@ -230,7 +235,7 @@
       isLoading.value = true
       error.value = null
 
-      // Get current logged-in user
+      // Fetch user data
       const authResponse = await authService.getCurrentUser()
       currentUser.value = authResponse.user
 
@@ -254,14 +259,24 @@
         _id: userData._id,
         name: userData.displayName || userData.username,
         handle: userData.username,
-        avatar: userData.avatarUrl || 'https://randomuser.me/api/portraits/men/1.jpg',
-        coverPhoto: 'https://images.unsplash.com/photo-1579547945413-497e1b99dac0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80',
-        bio: userData.bio || 'No bio yet',
+        avatar: userData.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.username)}&background=random`,
+        coverPhoto: '',
+        bio: userData.bio || '',
         location: '',
         website: userData.profileUrl || '',
         joinDate: userData.createdAt ? formatDate(userData.createdAt) : 'Recently',
-        followersCount: 0,
-        followingCount: 0
+        followersCount: userData.followersCount || 0,
+        followingCount: userData.followingCount || 0
+      }
+
+      // Check if following this user (only if viewing another user's profile)
+      if (currentUser.value && userData._id !== currentUser.value.id) {
+        try {
+          const followStatus = await followService.checkFollowStatus(userData._id)
+          isFollowing.value = followStatus.isFollowing
+        } catch (err) {
+          console.error('Error checking follow status:', err)
+        }
       }
 
       // Fetch user's posts
@@ -274,7 +289,7 @@
           id: post.author._id,
           name: post.author.displayName || post.author.username,
           handle: post.author.username,
-          avatar: post.author.avatarUrl || 'https://randomuser.me/api/portraits/men/1.jpg'
+          avatar: post.author.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(post.author.username)}&background=random`
         },
         content: post.content,
         time: formatTimeAgo(post.createdAt),
@@ -299,9 +314,33 @@
     fetchUserData()
   })
   
-  const toggleFollow = () => {
-    isFollowing.value = !isFollowing.value
-    // TODO: Implement follow/unfollow API call
+  const toggleFollow = async () => {
+    if (!currentUser.value) {
+      // Redirect to login
+      window.location.href = 'http://localhost:3000/auth/github'
+      return
+    }
+
+    if (isOwnProfile.value) return
+
+    isFollowLoading.value = true
+
+    try {
+      if (isFollowing.value) {
+        await followService.unfollowUser(user.value._id)
+        isFollowing.value = false
+        user.value.followersCount = Math.max(0, user.value.followersCount - 1)
+      } else {
+        await followService.followUser(user.value._id)
+        isFollowing.value = true
+        user.value.followersCount++
+      }
+    } catch (err: any) {
+      console.error('Error toggling follow:', err)
+      error.value = 'Failed to update follow status'
+    } finally {
+      isFollowLoading.value = false
+    }
   }
 
 </script>

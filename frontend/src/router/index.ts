@@ -20,34 +20,29 @@ const router = createRouter({
       component: PostView,
     },
     {
-      path: '/user/followers',
+      path: '/:user/followers',
       name: 'followers',
       component: FollowView
     },
     {
-      path: '/user/following',
+      path: '/:user/following',
       name: 'following',
       component: FollowView
     },
     {
-      path: '/user/profile',
-      name: 'myprofile',
-      component: ProfileView
+      path: '/:user/newpost',
+      name: 'newpost',
+      component: NewPostView
+    },
+    {
+      path: '/:post/forks',
+      name: 'forks',
+      component: ForksView
     },
     {
       path: '/:user',
       name: 'profile',
       component: ProfileView
-    },
-    {
-      path: '/:user/newpost',
-      name: 'NewPost',
-      component: NewPostView
-    },
-    {
-    path: '/:post/forks',
-    name: 'ForksView',
-    component: ForksView
     }
   ],
 })
