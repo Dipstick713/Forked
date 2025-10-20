@@ -73,10 +73,18 @@ router.put('/profile', async (req, res) => {
   }
 
   try {
-    const { displayName, bio } = req.body;
+    const { displayName, bio, location, website } = req.body;
+    
+    // Build update object with only provided fields
+    const updateData = {};
+    if (displayName !== undefined) updateData.displayName = displayName;
+    if (bio !== undefined) updateData.bio = bio;
+    if (location !== undefined) updateData.location = location;
+    if (website !== undefined) updateData.website = website;
+
     const updatedUser = await User.findByIdAndUpdate(
       req.user._id,
-      { displayName, bio },
+      updateData,
       { new: true, runValidators: true }
     ).select('-__v');
 

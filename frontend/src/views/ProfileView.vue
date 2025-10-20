@@ -73,10 +73,131 @@
             </button>
             <button 
               v-else-if="isOwnProfile"
+              @click="showEditModal = true"
               class="px-4 py-1.5 bg-transparent border border-neutral-600 text-white rounded-full font-bold hover:bg-neutral-800 transition"
             >
               Edit Profile
             </button>
+          </div>
+
+          <!-- Edit Profile Modal -->
+          <div 
+            v-if="showEditModal" 
+            class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            @click.self="showEditModal = false"
+          >
+            <div class="bg-[#0e0f10] border border-neutral-800 rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto">
+              <!-- Modal Header -->
+              <div class="sticky top-0 bg-[#0e0f10] border-b border-neutral-800 p-4 flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                  <button 
+                    @click="showEditModal = false"
+                    class="rounded-full p-2 hover:bg-neutral-800 transition"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                  <h2 class="text-xl font-bold">Edit Profile</h2>
+                </div>
+                <button 
+                  @click="saveProfile"
+                  :disabled="isSaving"
+                  class="bg-green-500 hover:bg-green-600 text-black px-4 py-1.5 rounded-full font-bold disabled:opacity-50 transition"
+                >
+                  {{ isSaving ? 'Saving...' : 'Save' }}
+                </button>
+              </div>
+
+              <!-- Modal Body -->
+              <div class="p-4 space-y-6">
+                <!-- Cover Photo Section -->
+                <div class="relative h-48 bg-neutral-800 rounded-lg overflow-hidden group cursor-pointer">
+                  <img 
+                    v-if="editForm.coverPhoto" 
+                    :src="editForm.coverPhoto" 
+                    class="w-full h-full object-cover"
+                    alt="Cover photo"
+                  >
+                  <div v-if="!editForm.coverPhoto" class="w-full h-full flex items-center justify-center text-neutral-500">
+                    <span class="text-sm">No cover photo</span>
+                  </div>
+                  <div class="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <div class="bg-neutral-800/80 backdrop-blur-sm rounded-full p-3 hover:bg-neutral-700/80 transition">
+                      <Camera :size="24" />
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Avatar Section -->
+                <div class="relative -mt-20 ml-4 w-32 h-32">
+                  <div class="relative w-full h-full rounded-full border-4 border-[#0e0f10] bg-neutral-800 overflow-hidden group cursor-pointer">
+                    <img 
+                      :src="editForm.avatar" 
+                      class="w-full h-full object-cover"
+                      alt="Profile picture"
+                    >
+                    <div class="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      <div class="bg-neutral-800/80 backdrop-blur-sm rounded-full p-2 hover:bg-neutral-700/80 transition">
+                        <Camera :size="20" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Form Fields -->
+                <div class="space-y-4 mt-4">
+                  <!-- Name -->
+                  <div>
+                    <label class="block text-sm text-neutral-400 mb-2">Name</label>
+                    <input 
+                      v-model="editForm.name"
+                      type="text"
+                      maxlength="50"
+                      class="w-full bg-transparent border border-neutral-700 rounded-lg px-4 py-3 focus:border-green-500 focus:outline-none transition"
+                      placeholder="Your name"
+                    >
+                    <p class="text-xs text-neutral-500 mt-1">{{ editForm.name.length }}/50</p>
+                  </div>
+
+                  <!-- Bio -->
+                  <div>
+                    <label class="block text-sm text-neutral-400 mb-2">Bio</label>
+                    <textarea 
+                      v-model="editForm.bio"
+                      maxlength="160"
+                      rows="3"
+                      class="w-full bg-transparent border border-neutral-700 rounded-lg px-4 py-3 focus:border-green-500 focus:outline-none transition resize-none"
+                      placeholder="Tell us about yourself"
+                    ></textarea>
+                    <p class="text-xs text-neutral-500 mt-1">{{ editForm.bio.length }}/160</p>
+                  </div>
+
+                  <!-- Location -->
+                  <div>
+                    <label class="block text-sm text-neutral-400 mb-2">Location</label>
+                    <input 
+                      v-model="editForm.location"
+                      type="text"
+                      maxlength="30"
+                      class="w-full bg-transparent border border-neutral-700 rounded-lg px-4 py-3 focus:border-green-500 focus:outline-none transition"
+                      placeholder="Where are you based?"
+                    >
+                  </div>
+
+                  <!-- Website -->
+                  <div>
+                    <label class="block text-sm text-neutral-400 mb-2">Website</label>
+                    <input 
+                      v-model="editForm.website"
+                      type="url"
+                      class="w-full bg-transparent border border-neutral-700 rounded-lg px-4 py-3 focus:border-green-500 focus:outline-none transition"
+                      placeholder="https://example.com"
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
   
           <!-- User Info -->
@@ -171,8 +292,9 @@
   </template>
   
   <script setup lang="ts">
-  import { onMounted, ref, computed } from 'vue'
+  import { onMounted, ref, computed, watch } from 'vue'
   import { useRoute } from 'vue-router'
+  import { Camera } from 'lucide-vue-next'
   import Sidebar from '@/components/Sidebar.vue'
   import RightPanel from '@/components/RightPanel.vue'
   import PostCard from '@/components/Card.vue'
@@ -188,6 +310,8 @@
   const isFollowLoading = ref(false)
   const error = ref<string | null>(null)
   const currentUser = ref<any>(null)
+  const showEditModal = ref(false)
+  const isSaving = ref(false)
   
   const user = ref({
     _id: '',
@@ -201,6 +325,15 @@
     joinDate: '',
     followersCount: 0,
     followingCount: 0
+  })
+
+  const editForm = ref({
+    name: '',
+    bio: '',
+    location: '',
+    website: '',
+    avatar: '',
+    coverPhoto: ''
   })
   
   const posts = ref([])
@@ -269,6 +402,18 @@
         followingCount: userData.followingCount || 0
       }
 
+      // Populate edit form if viewing own profile
+      if (isOwnProfile.value) {
+        editForm.value = {
+          name: user.value.name,
+          bio: user.value.bio,
+          location: user.value.location,
+          website: user.value.website,
+          avatar: user.value.avatar,
+          coverPhoto: user.value.coverPhoto
+        }
+      }
+
       // Check if following this user (only if viewing another user's profile)
       if (currentUser.value && userData._id !== currentUser.value.id) {
         try {
@@ -312,6 +457,33 @@
 
   onMounted(() => {
     fetchUserData()
+    
+    // Add keyboard event listener for Escape key
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && showEditModal.value) {
+        showEditModal.value = false
+      }
+    }
+    window.addEventListener('keydown', handleEscape)
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener('keydown', handleEscape)
+    }
+  })
+
+  // Watch for modal open to populate form
+  watch(showEditModal, (isOpen) => {
+    if (isOpen && isOwnProfile.value) {
+      editForm.value = {
+        name: user.value.name,
+        bio: user.value.bio,
+        location: user.value.location,
+        website: user.value.website,
+        avatar: user.value.avatar,
+        coverPhoto: user.value.coverPhoto
+      }
+    }
   })
   
   const toggleFollow = async () => {
@@ -340,6 +512,39 @@
       error.value = 'Failed to update follow status'
     } finally {
       isFollowLoading.value = false
+    }
+  }
+
+  const saveProfile = async () => {
+    if (!currentUser.value) return
+
+    isSaving.value = true
+    error.value = null
+
+    try {
+      // Update user profile via API
+      const updatedData = await userService.updateProfile({
+        displayName: editForm.value.name,
+        bio: editForm.value.bio,
+        location: editForm.value.location,
+        website: editForm.value.website
+      })
+
+      // Update local user data
+      user.value.name = editForm.value.name
+      user.value.bio = editForm.value.bio
+      user.value.location = editForm.value.location
+      user.value.website = editForm.value.website
+
+      // Close modal
+      showEditModal.value = false
+      
+      console.log('Profile updated successfully')
+    } catch (err: any) {
+      console.error('Error updating profile:', err)
+      error.value = 'Failed to update profile'
+    } finally {
+      isSaving.value = false
     }
   }
 
