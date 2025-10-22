@@ -4,6 +4,14 @@ const Like = require('../models/Like');
 const Notification = require('../models/Notification');
 const router = express.Router();
 
+// Authentication middleware
+const requireAuth = (req, res, next) => {
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ message: 'Authentication required' });
+  }
+  next();
+};
+
 // Get all posts (with optional pagination)
 router.get('/', async (req, res) => {
   try {
@@ -42,9 +50,18 @@ router.get('/:id', async (req, res) => {
 });
 
 // Create a new post
-router.post('/', async (req, res) => {
+router.post('/', requireAuth, async (req, res) => {
   try {
     const { content, parentId, image } = req.body;
+
+    // Validate content
+    if (!content || !content.trim()) {
+      return res.status(400).json({ message: 'Post content is required' });
+    }
+
+    if (content.length > 280) {
+      return res.status(400).json({ message: 'Post content must be 280 characters or less' });
+    }
 
     const postData = {
       content,
@@ -63,6 +80,12 @@ router.post('/', async (req, res) => {
 
     const post = new Post(postData);
     const savedPost = await post.save();
+    
+    // For parent posts, set seed to its own _id
+    if (!parentId) {
+      savedPost.seed = savedPost._id;
+      await savedPost.save();
+    }
     
     // Populate author info for immediate response
     await savedPost.populate('author', 'username displayName avatarUrl');
@@ -87,7 +110,7 @@ router.post('/', async (req, res) => {
 });
 
 // Like/unlike a post
-router.put('/:id/like', async (req, res) => {
+router.put('/:id/like', requireAuth, async (req, res) => {
   try {
     const { action } = req.body;
     const postId = req.params.id;
@@ -130,7 +153,7 @@ router.put('/:id/like', async (req, res) => {
 });
 
 // Delete a post
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireAuth, async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
     

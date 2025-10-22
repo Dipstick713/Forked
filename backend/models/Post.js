@@ -18,8 +18,7 @@ const postSchema = new mongoose.Schema({
   },
   seed: { 
     type: mongoose.Schema.Types.ObjectId, 
-    ref: 'Post', 
-    required: true 
+    ref: 'Post'
   },
   image: { 
     type: String 
@@ -46,12 +45,9 @@ postSchema.virtual('branches', {
   foreignField: 'parent'
 });
 
-// Auto-set seed if not provided
-postSchema.pre('save', function(next) {
-  if (this.isNew && !this.seed) {
-    this.seed = this.parent ? this.parent.seed : this._id;
-  }
-  next();
-});
+// Note: For parent posts (posts without a parent), 
+// seed should be set to the post's own _id after creation
+// This is handled in the POST route, not in the pre-save hook
+// because _id is not available until after the first save
 
 module.exports = mongoose.model('Post', postSchema);
