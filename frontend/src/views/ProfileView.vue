@@ -301,6 +301,7 @@
   import { userService } from '@/services/userService'
   import { authService } from '@/services/auth'
   import { followService } from '@/services/followService'
+  import { getUserLikedPosts } from '@/services/likeService'
   
   const route = useRoute()
   const activeTab = ref<string>('Posts')
@@ -424,8 +425,14 @@
         }
       }
 
-      // Fetch user's posts
-      const userPosts = await userService.getUserPosts(userData._id)
+      // Fetch user's posts and liked posts in parallel
+      const [userPosts, likedPostIds] = await Promise.all([
+        userService.getUserPosts(userData._id),
+        currentUser.value ? getUserLikedPosts().catch(() => []) : Promise.resolve([])
+      ])
+      
+      // Create a Set for faster lookup
+      const likedSet = new Set(likedPostIds)
       
       // Map posts to Card component format
       posts.value = userPosts.map((post: any) => ({
@@ -439,7 +446,7 @@
         content: post.content,
         time: formatTimeAgo(post.createdAt),
         image: post.image || '',
-        liked: false,
+        liked: likedSet.has(post._id),
         stats: {
           replies: post.stats?.replies || 0,
           reposts: post.stats?.forks || 0,
