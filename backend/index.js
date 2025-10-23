@@ -13,6 +13,7 @@ const postRoutes = require('./routes/posts');
 const userRoutes = require('./routes/users');
 const followRoutes = require('./routes/follows');
 const notificationRoutes = require('./routes/notifications');
+const likeRoutes = require('./routes/likes');
 const passport = require('./passport');
 
 // Connect to database
@@ -42,6 +43,7 @@ app.use('/api/posts', postRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/follows', followRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/likes', likeRoutes);
 // Health check route
 app.get('/api/health', (req, res) => {
   res.json({ message: 'Forked API is running', status: 'OK' });

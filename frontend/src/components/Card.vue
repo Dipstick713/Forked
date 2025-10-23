@@ -86,11 +86,12 @@
 
           <!-- Like -->
           <button 
-            class="flex items-center gap-1 hover:text-pink-500 group"
-            @click="post.liked = !post.liked"
+            class="flex items-center gap-1 group"
+            :class="post.liked ? 'text-pink-500' : 'hover:text-pink-500'"
+            @click="toggleLike"
           >
             <div class="p-2 rounded-full group-hover:bg-pink-500/10">
-              <Heart class="size-5"/>
+              <Heart :class="post.liked ? 'fill-current' : ''" class="size-5"/>
             </div>
             <span class="text-sm">{{ post.stats.likes }}</span>
           </button>
@@ -126,6 +127,7 @@ import {
   FolderTree
 } from 'lucide-vue-next';
 import { ref } from 'vue';
+import { likePost, unlikePost } from '../services/likeService';
 
 const props = defineProps({
   post: {
@@ -156,7 +158,7 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['delete']);
+const emit = defineEmits(['delete', 'like-updated']);
 
 const showDropdown = ref(false);
 const isCurrentUserPost = props.post.user.id === props.currentUserId;
@@ -165,6 +167,23 @@ const deletePost = () => {
   if (confirm('Are you sure you want to delete this post?')) {
     emit('delete', props.post.id);
     showDropdown.value = false;
+  }
+};
+
+const toggleLike = async () => {
+  try {
+    if (props.post.liked) {
+      const result = await unlikePost(props.post.id);
+      props.post.liked = false;
+      props.post.stats.likes = result.likes;
+    } else {
+      const result = await likePost(props.post.id);
+      props.post.liked = true;
+      props.post.stats.likes = result.likes;
+    }
+    emit('like-updated', props.post.id, props.post.liked);
+  } catch (error) {
+    console.error('Error toggling like:', error);
   }
 };
 </script>

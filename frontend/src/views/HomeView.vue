@@ -58,6 +58,7 @@ import Sidebar from '@/components/Sidebar.vue'
 import Card from '@/components/Card.vue'
 import RightPanel from '@/components/RightPanel.vue'
 import { postService } from '@/services/postService'
+import { getUserLikedPosts } from '@/services/likeService'
 
 const posts = ref([])
 const isLoading = ref(true)
@@ -83,7 +84,14 @@ const fetchPosts = async () => {
   error.value = null
   
   try {
-    const postsData = await postService.getPosts()
+    // Fetch posts and liked posts in parallel
+    const [postsData, likedPostIds] = await Promise.all([
+      postService.getPosts(),
+      getUserLikedPosts().catch(() => []) // Fallback to empty array if not logged in
+    ])
+    
+    // Create a Set for faster lookup
+    const likedSet = new Set(likedPostIds)
     
     // Map posts to Card component format
     posts.value = postsData.map((post: any) => ({
@@ -97,7 +105,7 @@ const fetchPosts = async () => {
       content: post.content,
       time: formatTimeAgo(post.createdAt),
       image: post.image || '',
-      liked: false, // TODO: Check if current user has liked this post
+      liked: likedSet.has(post._id),
       stats: {
         replies: post.stats?.replies || 0,
         reposts: post.stats?.forks || 0,
