@@ -282,8 +282,29 @@
         </div>
   
         <!-- Likes -->
-        <div v-if="activeTab === 'Likes'" class="p-8 text-center text-neutral-500">
-          No likes yet
+        <div v-if="activeTab === 'Likes'">
+          <!-- Loading State -->
+          <div v-if="isLoadingLikes" class="flex items-center justify-center p-20">
+            <div class="text-center">
+              <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-pink-500 mx-auto"></div>
+              <p class="text-neutral-500 mt-4">Loading liked posts...</p>
+            </div>
+          </div>
+
+          <!-- Liked Posts -->
+          <div v-else-if="likedPosts.length > 0">
+            <PostCard 
+              v-for="post in likedPosts" 
+              :key="post.id" 
+              :post="post"
+            />
+          </div>
+
+          <!-- Empty State -->
+          <div v-else class="p-8 text-center text-neutral-500">
+            <p class="text-lg mb-2">No liked posts yet</p>
+            <p class="text-sm">Posts liked by @{{ user.handle }} will appear here</p>
+          </div>
         </div>
        </div>
       </div>
@@ -301,7 +322,7 @@
   import { userService } from '@/services/userService'
   import { authService } from '@/services/auth'
   import { followService } from '@/services/followService'
-  import { getUserLikedPosts } from '@/services/likeService'
+  import { getUserLikedPosts, getUserLikedPostsWithDetails } from '@/services/likeService'
   
   const route = useRoute()
   const activeTab = ref<string>('Posts')
@@ -338,6 +359,8 @@
   })
   
   const posts = ref([])
+  const likedPosts = ref([])
+  const isLoadingLikes = ref(false)
 
   // Check if viewing own profile
   const isOwnProfile = computed(() => {
@@ -461,6 +484,56 @@
       isLoading.value = false
     }
   }
+
+  // Fetch liked posts
+  const fetchLikedPosts = async () => {
+    if (!user.value._id) return
+
+    isLoadingLikes.value = true
+    
+    try {
+      const likesData = await getUserLikedPostsWithDetails(user.value._id)
+      
+      // Get current user's liked post IDs for marking
+      const likedPostIds = currentUser.value 
+        ? await getUserLikedPosts().catch(() => []) 
+        : []
+      const likedSet = new Set(likedPostIds)
+      
+      // Map liked posts to Card component format
+      likedPosts.value = likesData
+        .filter((like: any) => like.post) // Filter out any likes where post was deleted
+        .map((like: any) => ({
+          id: like.post._id,
+          user: {
+            id: like.post.author._id,
+            name: like.post.author.displayName || like.post.author.username,
+            handle: like.post.author.username,
+            avatar: like.post.author.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(like.post.author.username)}&background=random`
+          },
+          content: like.post.content,
+          time: formatTimeAgo(like.post.createdAt),
+          image: like.post.image || '',
+          liked: likedSet.has(like.post._id),
+          stats: {
+            replies: like.post.stats?.replies || 0,
+            reposts: like.post.stats?.forks || 0,
+            likes: like.post.stats?.likes || 0
+          }
+        }))
+    } catch (err: any) {
+      console.error('Error fetching liked posts:', err)
+    } finally {
+      isLoadingLikes.value = false
+    }
+  }
+
+  // Watch for tab changes to load liked posts when needed
+  watch(activeTab, (newTab) => {
+    if (newTab === 'Likes' && likedPosts.value.length === 0) {
+      fetchLikedPosts()
+    }
+  })
 
   onMounted(() => {
     fetchUserData()
