@@ -1,14 +1,11 @@
 <template>
-    <div class="flex justify-center bg-[#0e0f10] text-white min-h-screen">
-      <Sidebar/>
-      
-      <div class="flex flex-col w-full max-w-[600px] border-x border-neutral-800 h-screen overflow-hidden">
-        <!-- Header -->
-        <div class="sticky top-0 z-10 bg-[#0e0f10] p-4 border-b border-neutral-800 flex items-center">
-          <button @click="goBack" class="mr-4">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
-            </svg>
+    <div class="flex flex-col w-full max-w-[600px] border-x border-neutral-800 h-screen overflow-hidden">
+      <!-- Header -->
+      <div class="sticky top-0 z-10 bg-[#0e0f10] p-4 border-b border-neutral-800 flex items-center">
+        <button @click="goBack" class="mr-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+          </svg>
           </button>
           <h1 class="text-xl font-bold">Forked Posts</h1>
         </div>
@@ -52,17 +49,12 @@
           </div>
         </div>
       </div>
-      
-      <RightPanel/>
-    </div>
   </template>
   
   <script setup lang="ts">
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
-  import Sidebar from '@/components/Sidebar.vue'
   import Card from '@/components/Card.vue'
-  import RightPanel from '@/components/RightPanel.vue'
   
   // Hardcoded data
   const currentPost = {

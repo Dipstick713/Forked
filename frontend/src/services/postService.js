@@ -19,6 +19,28 @@ export const postService = {
     }
   },
 
+  // Get a specific post
+  async getPost(postId) {
+    try {
+      const response = await api.get(`/api/posts/${postId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching post:', error);
+      throw error;
+    }
+  },
+
+  // Get replies for a post
+  async getPostReplies(postId) {
+    try {
+      const response = await api.get(`/api/posts/${postId}/replies`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching replies:', error);
+      throw error;
+    }
+  },
+
   // Create new post
   async createPost(postData) {
     try {

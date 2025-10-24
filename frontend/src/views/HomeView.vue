@@ -1,13 +1,10 @@
 <template>
-  <div class="flex justify-center bg-[#0e0f10] text-white min-h-screen">
-    <Sidebar/>
-    
-    <!-- Central scrollable content -->
-    <div class="flex flex-col w-full max-w-[600px] border-x border-neutral-800 h-screen overflow-hidden">
-      <!-- Fixed header -->
-      <div class="sticky top-0 z-10 bg-[#0e0f10] p-4 border-b border-neutral-800">
-        <h1 class="text-xl font-bold">Home</h1>
-      </div>
+  <!-- Central scrollable content -->
+  <div class="flex flex-col w-full max-w-[600px] border-x border-neutral-800 h-screen overflow-hidden">
+    <!-- Fixed header -->
+    <div class="sticky top-0 z-10 bg-[#0e0f10] p-4 border-b border-neutral-800">
+      <h1 class="text-xl font-bold">Home</h1>
+    </div>
       
       <!-- Scrollable posts container -->
       <div class="flex-1 overflow-y-auto px-4 py-2 scrollbar-hide">
@@ -45,18 +42,13 @@
         </div>
       </div>
 
-    </div>
-    
-    <RightPanel/>
   </div>
 </template>
 
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import Sidebar from '@/components/Sidebar.vue'
 import Card from '@/components/Card.vue'
-import RightPanel from '@/components/RightPanel.vue'
 import { postService } from '@/services/postService'
 import { getUserLikedPosts } from '@/services/likeService'
 

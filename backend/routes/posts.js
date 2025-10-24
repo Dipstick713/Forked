@@ -49,6 +49,19 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+// Get replies/comments for a specific post
+router.get('/:id/replies', async (req, res) => {
+  try {
+    const replies = await Post.find({ parent: req.params.id })
+      .populate('author', 'username displayName avatarUrl')
+      .sort({ createdAt: -1 });
+
+    res.json(replies);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Create a new post
 router.post('/', requireAuth, async (req, res) => {
   try {

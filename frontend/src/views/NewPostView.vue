@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import Sidebar from '@/components/Sidebar.vue'
-import RightPanel from '@/components/RightPanel.vue'
 import { useRouter } from 'vue-router'
 import { Image, X, ArrowLeft } from 'lucide-vue-next'
 import { postService } from '@/services/postService'
@@ -130,14 +128,12 @@ const handleKeyDown = (e: KeyboardEvent) => {
 </script>
 
 <template>
-  <div class="flex justify-center bg-[#0e0f10] text-white min-h-screen">
-    <Sidebar/>
-    <div class="w-full max-w-[600px] border-x border-neutral-800 min-h-screen">
-      <!-- Header -->
-      <div class="sticky top-0 z-10 bg-[#0e0f10]/90 backdrop-blur-sm p-4 border-b border-neutral-800">
-        <div class="flex items-center justify-between">
-          <button @click="router.back()" class="rounded-full p-2 hover:bg-neutral-800 transition">
-            <ArrowLeft :size="20" />
+  <div class="w-full max-w-[600px] border-x border-neutral-800 min-h-screen">
+    <!-- Header -->
+    <div class="sticky top-0 z-10 bg-[#0e0f10]/90 backdrop-blur-sm p-4 border-b border-neutral-800">
+      <div class="flex items-center justify-between">
+        <button @click="router.back()" class="rounded-full p-2 hover:bg-neutral-800 transition">
+          <ArrowLeft :size="20" />
           </button>
           <h1 class="text-xl font-bold">New Post</h1>
           <button 
@@ -199,7 +195,5 @@ const handleKeyDown = (e: KeyboardEvent) => {
           </div>
         </div>
       </div>
-    </div>
-    <RightPanel/>
   </div>
 </template>

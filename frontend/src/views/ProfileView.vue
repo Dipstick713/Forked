@@ -1,14 +1,12 @@
 <template>
-    <div class="flex justify-center bg-[#0e0f10] text-white min-h-screen">
-      <Sidebar/>
-      <div class="w-full max-w-[600px] border-x border-neutral-800 flex flex-col h-screen overflow-hidden">
-        <!-- Header -->
-        <div class="sticky top-0 z-10 bg-[#0e0f10]/90 backdrop-blur-sm p-4 border-b border-neutral-800 flex items-center gap-6">
-          <button @click="$router.back()" class="rounded-full p-2 hover:bg-neutral-800">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-          </button>
+    <div class="w-full max-w-[600px] border-x border-neutral-800 flex flex-col h-screen overflow-hidden">
+      <!-- Header -->
+      <div class="sticky top-0 z-10 bg-[#0e0f10]/90 backdrop-blur-sm p-4 border-b border-neutral-800 flex items-center gap-6">
+        <button @click="$router.back()" class="rounded-full p-2 hover:bg-neutral-800">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+          </svg>
+        </button>
           <div>
             <h1 class="text-xl font-bold">{{ user.name || 'Loading...' }}</h1>
             <p class="text-sm text-neutral-500">{{ posts.length }} posts</p>
@@ -307,8 +305,6 @@
           </div>
         </div>
        </div>
-      </div>
-      <RightPanel/>
     </div>
   </template>
   
@@ -316,8 +312,6 @@
   import { onMounted, ref, computed, watch } from 'vue'
   import { useRoute } from 'vue-router'
   import { Camera } from 'lucide-vue-next'
-  import Sidebar from '@/components/Sidebar.vue'
-  import RightPanel from '@/components/RightPanel.vue'
   import PostCard from '@/components/Card.vue'
   import { userService } from '@/services/userService'
   import { authService } from '@/services/auth'

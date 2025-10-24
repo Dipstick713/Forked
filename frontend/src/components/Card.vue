@@ -64,13 +64,14 @@
         </div>
 
         <!-- Post Text -->
-        <p class="mt-1 text-white text-base">{{ post.content }}</p>
+        <p class="mt-1 text-white text-base cursor-pointer" @click="goToPost">{{ post.content }}</p>
 
         <!-- Image (optional) -->
         <img 
           v-if="post.image" 
           :src="post.image" 
-          class="mt-3 rounded-xl border border-neutral-800 max-h-80 w-full object-cover"
+          class="mt-3 rounded-xl border border-neutral-800 max-h-80 w-full object-cover cursor-pointer"
+          @click="goToPost"
         >
 
         <!-- Actions -->
@@ -199,5 +200,9 @@ const toggleLike = async () => {
 
 const goToProfile = () => {
   router.push(`/${props.post.user.handle}`);
+};
+
+const goToPost = () => {
+  router.push(`/post/${props.post.id}`);
 };
 </script>
