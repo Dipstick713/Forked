@@ -4,8 +4,9 @@
       <!-- Avatar -->
       <img 
         :src="post.user.avatar" 
-        class="w-12 h-12 rounded-full object-cover border border-neutral-700 flex-shrink-0"
+        class="w-12 h-12 rounded-full object-cover border border-neutral-700 flex-shrink-0 cursor-pointer hover:opacity-90 transition"
         alt="User avatar"
+        @click="goToProfile"
       >
 
       <!-- Content -->
@@ -13,8 +14,14 @@
         <!-- Header -->
         <div class="flex items-center gap-1 text-sm">
           <div class="flex items-baseline min-w-0 max-w-[calc(100%-40px)]">
-            <span class="font-bold text-white truncate max-w-[120px]">{{ post.user.name }}</span>
-            <span class="text-neutral-500 truncate ml-1">@{{ post.user.handle }}</span>
+            <span 
+              class="font-bold text-white truncate max-w-[120px] cursor-pointer hover:underline"
+              @click="goToProfile"
+            >{{ post.user.name }}</span>
+            <span 
+              class="text-neutral-500 truncate ml-1 cursor-pointer hover:underline"
+              @click="goToProfile"
+            >@{{ post.user.handle }}</span>
           </div>
           <span class="text-neutral-500 flex-shrink-0">·</span>
           <span class="text-neutral-500 whitespace-nowrap flex-shrink-0">{{ post.time }}</span>
@@ -127,7 +134,10 @@ import {
   FolderTree
 } from 'lucide-vue-next';
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { likePost, unlikePost } from '../services/likeService';
+
+const router = useRouter();
 
 const props = defineProps({
   post: {
@@ -185,5 +195,9 @@ const toggleLike = async () => {
   } catch (error) {
     console.error('Error toggling like:', error);
   }
+};
+
+const goToProfile = () => {
+  router.push(`/${props.post.user.handle}`);
 };
 </script>
