@@ -76,14 +76,6 @@
 
         <!-- Actions -->
         <div class="flex justify-between mt-3 text-neutral-500 max-w-md">
-          <!-- Reply -->
-          <button class="flex items-center gap-1 hover:text-blue-400 group">
-            <div class="p-2 rounded-full group-hover:bg-blue-400/10">
-              <MessageCircle class="size-5"/>
-            </div>
-            <span class="text-sm">{{ post.stats.replies }}</span>
-          </button>
-
           <!-- Repost -->
           <button class="flex items-center gap-1 hover:text-green-500 group">
             <div class="p-2 rounded-full group-hover:bg-green-500/10">
@@ -104,13 +96,6 @@
             <span class="text-sm">{{ post.stats.likes }}</span>
           </button>
 
-          <button class="flex items-center gap-1 hover:text-yellow-500 group">
-            <div class="p-2 rounded-full group-hover:bg-yellow-500/10">
-              <FolderTree class="size-5"/>
-            </div>
-            <span class="text-sm">{{ post.stats.reposts }}</span>
-          </button>
-
           <!-- Share -->
           <button class="flex items-center gap-1 hover:text-blue-400 group">
             <div class="p-2 rounded-full group-hover:bg-blue-400/10">
@@ -126,7 +111,6 @@
 <script setup>
 import { 
   GitBranch, 
-  MessageCircle, 
   Heart, 
   Share, 
   Ellipsis,
