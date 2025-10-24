@@ -59,16 +59,19 @@
         </div>
 
         <!-- Followers Tab Content -->
-        <div v-else-if="activeTab === 'followers'" class="divide-y divide-neutral-800">
+        <div v-else-if="activeTab === 'followers'">
           <div v-if="followers.length === 0" class="p-8 text-center text-neutral-500">
             <p>No followers yet</p>
           </div>
           <div
             v-else
-            v-for="followerUser in followers"
-            :key="followerUser.id"
-            class="p-4 hover:bg-[#1e2124] transition cursor-pointer"
+            class="divide-y divide-neutral-800"
           >
+            <div
+              v-for="followerUser in followers"
+              :key="followerUser.id"
+              class="p-4 hover:bg-[#1e2124] transition cursor-pointer"
+            >
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
                 <router-link :to="`/${followerUser.handle}`">
@@ -99,19 +102,23 @@
               </button>
             </div>
           </div>
+          </div>
         </div>
 
         <!-- Following Tab Content -->
-        <div v-if="activeTab === 'following'" class="divide-y divide-neutral-800">
+        <div v-else-if="activeTab === 'following'">
           <div v-if="following.length === 0" class="p-8 text-center text-neutral-500">
             <p>Not following anyone yet</p>
           </div>
           <div
             v-else
-            v-for="followingUser in following"
-            :key="followingUser.id"
-            class="p-4 hover:bg-neutral-900/50 transition"
+            class="divide-y divide-neutral-800"
           >
+            <div
+              v-for="followingUser in following"
+              :key="followingUser.id"
+              class="p-4 hover:bg-neutral-900/50 transition"
+            >
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
                 <router-link :to="`/${followingUser.handle}`">
@@ -140,6 +147,7 @@
                 {{ followingUser.isFollowing ? 'Following' : 'Follow' }}
               </button>
             </div>
+          </div>
           </div>
         </div>
       </div>
