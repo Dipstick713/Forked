@@ -88,10 +88,16 @@
                   </button>
 
                   <!-- Share -->
-                  <button class="flex items-center gap-1 hover:text-blue-400 group">
+                  <button 
+                    class="flex items-center gap-1 group relative"
+                    :class="copied ? 'text-green-500' : 'hover:text-blue-400'"
+                    @click="copyPostLink"
+                  >
                     <div class="p-2 rounded-full group-hover:bg-blue-400/10">
-                      <Share class="size-5"/>
+                      <Check v-if="copied" class="size-5"/>
+                      <Share v-else class="size-5"/>
                     </div>
+                    <span v-if="copied" class="text-xs text-green-500">Copied!</span>
                   </button>
                 </div>
               </div>
@@ -104,7 +110,7 @@
   <script setup lang="ts">
   import { ref, onMounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
-  import { GitBranch, Heart, Share, ArrowLeft } from 'lucide-vue-next'
+  import { GitBranch, Heart, Share, ArrowLeft, Check } from 'lucide-vue-next'
   import { postService } from '@/services/postService'
   import { authService } from '@/services/auth'
   import { likePost, unlikePost, getUserLikedPosts } from '@/services/likeService'
@@ -116,6 +122,7 @@
   const currentUser = ref<any>(null)
   const isLoading = ref(true)
   const error = ref<string | null>(null)
+  const copied = ref(false)
 
   // Format full date
   const formatFullDate = (dateString: string) => {
@@ -206,6 +213,19 @@
       }
     } catch (error) {
       console.error('Error toggling like:', error)
+    }
+  }
+
+  const copyPostLink = async () => {
+    try {
+      const postUrl = `${window.location.origin}/post/${post.value.id}`
+      await navigator.clipboard.writeText(postUrl)
+      copied.value = true
+      setTimeout(() => {
+        copied.value = false
+      }, 2000)
+    } catch (error) {
+      console.error('Error copying link:', error)
     }
   }
 

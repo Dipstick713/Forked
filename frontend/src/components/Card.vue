@@ -97,10 +97,16 @@
           </button>
 
           <!-- Share -->
-          <button class="flex items-center gap-1 hover:text-blue-400 group">
+          <button 
+            class="flex items-center gap-1 group relative"
+            :class="copied ? 'text-green-500' : 'hover:text-blue-400'"
+            @click="copyPostLink"
+          >
             <div class="p-2 rounded-full group-hover:bg-blue-400/10">
-              <Share class="size-5"/>
+              <Check v-if="copied" class="size-5"/>
+              <Share v-else class="size-5"/>
             </div>
+            <span v-if="copied" class="text-xs text-green-500">Copied!</span>
           </button>
         </div>
       </div>
@@ -116,7 +122,8 @@ import {
   Ellipsis,
   Trash2,
   Flag,
-  FolderTree
+  FolderTree,
+  Check
 } from 'lucide-vue-next';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -156,6 +163,7 @@ const props = defineProps({
 const emit = defineEmits(['delete', 'like-updated']);
 
 const showDropdown = ref(false);
+const copied = ref(false);
 const isCurrentUserPost = props.post.user.id === props.currentUserId;
 
 const deletePost = () => {
@@ -188,5 +196,18 @@ const goToProfile = () => {
 
 const goToPost = () => {
   router.push(`/post/${props.post.id}`);
+};
+
+const copyPostLink = async () => {
+  try {
+    const postUrl = `${window.location.origin}/post/${props.post.id}`;
+    await navigator.clipboard.writeText(postUrl);
+    copied.value = true;
+    setTimeout(() => {
+      copied.value = false;
+    }, 2000);
+  } catch (error) {
+    console.error('Error copying link:', error);
+  }
 };
 </script>
