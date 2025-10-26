@@ -70,7 +70,10 @@
                 <!-- Actions -->
                 <div class="flex justify-between mt-3 text-neutral-500 max-w-md">
                   <!-- Fork -->
-                  <button class="flex items-center gap-1 hover:text-green-500 group">
+                  <button 
+                    class="flex items-center gap-1 hover:text-green-500 group"
+                    @click="goToFork"
+                  >
                     <div class="p-2 rounded-full group-hover:bg-green-500/10">
                       <GitBranch class="size-5"/>
                     </div>
@@ -139,6 +142,12 @@
 
   const goToProfile = (handle: string) => {
     router.push(`/${handle}`)
+  }
+
+  const goToFork = () => {
+    if (post.value) {
+      router.push(`/fork/${post.value.id}`)
+    }
   }
 
   const fetchPost = async () => {

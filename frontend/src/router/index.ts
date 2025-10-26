@@ -5,6 +5,7 @@ import ProfileView from '@/views/ProfileView.vue'
 import FollowView from '@/views/FollowView.vue'
 import NewPostView from '@/views/NewPostView.vue'
 import ForksView from '@/views/ForksView.vue'
+import ForkPostView from '@/views/ForkPostView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -18,6 +19,11 @@ const router = createRouter({
       path: '/post/:id',
       name: 'post',
       component: PostView,
+    },
+    {
+      path: '/fork/:id',
+      name: 'forkpost',
+      component: ForkPostView,
     },
     {
       path: '/:user/followers',
