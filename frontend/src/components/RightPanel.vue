@@ -27,7 +27,9 @@ const goToNewPost = () => {
 </script>
 
 <template>
-    <aside class="w-80 p-4 border-l border-[#253446]">
+  <aside class="w-80 p-4 border-l border-[#253446]">
+    <!-- Only show if user is logged in -->
+    <template v-if="currentUser">
       <div class="bg-gradient-to-br from-green-500 via-green-400 to-blue-300 p-4 rounded-lg mb-6">        
         <p class="text-sm text-[#0e0f10] font-bold">Plant a new seed of thought.</p>
         <button 
@@ -38,6 +40,19 @@ const goToNewPost = () => {
         </button>
       </div>
       <SearchBar/>
-    </aside>
-  </template>
+    </template>
+
+    <!-- Show login prompt if not logged in -->
+    <div v-else class="bg-[#16181a] border border-neutral-800 rounded-xl p-6">
+      <h3 class="text-lg font-bold text-white mb-2">New to Forked?</h3>
+      <p class="text-neutral-400 text-sm mb-4">Sign in to start forking discussions and sharing ideas.</p>
+      <a
+        href="http://localhost:3000/auth/github"
+        class="block text-center bg-green-500 hover:bg-green-600 text-black font-semibold py-2 px-4 rounded-full transition"
+      >
+        Sign in with GitHub
+      </a>
+    </div>
+  </aside>
+</template>
   

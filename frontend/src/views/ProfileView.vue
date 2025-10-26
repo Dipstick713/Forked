@@ -499,7 +499,7 @@
       
       // Map liked posts to Card component format
       likedPosts.value = likesData
-        .filter((like: any) => like.post) // Filter out any likes where post was deleted
+        .filter((like: any) => like.post && !like.post.deleted) // Filter out deleted posts
         .map((like: any) => ({
           id: like.post._id,
           user: {
@@ -512,6 +512,7 @@
           time: formatTimeAgo(like.post.createdAt),
           image: like.post.image || '',
           liked: likedSet.has(like.post._id),
+          deleted: like.post.deleted || false,
           stats: {
             replies: like.post.stats?.replies || 0,
             reposts: like.post.stats?.forks || 0,

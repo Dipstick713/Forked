@@ -148,6 +148,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { likePost, unlikePost } from '../services/likeService';
 import { postService } from '../services/postService';
+import { authService } from '../services/auth';
 import ConfirmDialog from './ConfirmDialog.vue';
 
 const router = useRouter();
