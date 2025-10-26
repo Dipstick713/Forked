@@ -114,6 +114,7 @@
       time: formatTimeAgo(postData.createdAt),
       createdAt: postData.createdAt,
       liked: likedSet.has(postData._id),
+      deleted: postData.deleted || false,
       stats: {
         replies: postData.stats?.replies || 0,
         reposts: postData.stats?.forks || 0,

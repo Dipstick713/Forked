@@ -1,6 +1,12 @@
 <template>
-  <div class="p-4 border-b border-neutral-800 hover:bg-[#181a1d] transition-colors duration-200 cursor-pointer" @click="goToPost">
-    <div class="flex gap-3">
+  <div class="p-4 border-b border-neutral-800 transition-colors duration-200" :class="{ 'hover:bg-[#181a1d] cursor-pointer': !post.deleted }" @click="post.deleted ? null : goToPost()">
+    <!-- Deleted Post State -->
+    <div v-if="post.deleted" class="text-neutral-500 italic py-2">
+      This post was deleted
+    </div>
+
+    <!-- Normal Post -->
+    <div v-else class="flex gap-3">
       <!-- Avatar -->
       <img 
         :src="post.user.avatar" 
@@ -30,7 +36,7 @@
           <div class="ml-auto relative flex-shrink-0">
             <button 
               @click.stop="showDropdown = !showDropdown"
-              class="text-neutral-500 hover:text-white p-2 rounded-full hover:bg-neutral-800"
+              class="text-neutral-500 hover:text-white p-2 rounded-full hover:bg-zinc-800"
             >
               <Ellipsis/> 
             </button>
@@ -114,6 +120,16 @@
         </div>
       </div>
     </div>
+
+    <!-- Confirmation Dialog -->
+    <ConfirmDialog
+      :show="showDeleteDialog"
+      title="Delete Post?"
+      message="This will mark your post as deleted. The post will remain visible in threads to preserve context, but will show as '[deleted]'."
+      confirmText="Delete"
+      @confirm="confirmDelete"
+      @cancel="showDeleteDialog = false"
+    />
   </div>
 </template>
 
@@ -131,6 +147,8 @@ import {
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { likePost, unlikePost } from '../services/likeService';
+import { postService } from '../services/postService';
+import ConfirmDialog from './ConfirmDialog.vue';
 
 const router = useRouter();
 
@@ -166,13 +184,28 @@ const props = defineProps({
 const emit = defineEmits(['delete', 'like-updated']);
 
 const showDropdown = ref(false);
+const showDeleteDialog = ref(false);
 const copied = ref(false);
 const isCurrentUserPost = props.post.user.id === props.currentUserId;
 
 const deletePost = () => {
-  if (confirm('Are you sure you want to delete this post?')) {
+  showDropdown.value = false;
+  showDeleteDialog.value = true;
+};
+
+const confirmDelete = async () => {
+  try {
+    await postService.deletePost(props.post.id);
+    showDeleteDialog.value = false;
     emit('delete', props.post.id);
-    showDropdown.value = false;
+    
+    // Mark post as deleted in UI
+    props.post.deleted = true;
+    props.post.content = '[deleted]';
+    props.post.image = '';
+  } catch (error) {
+    console.error('Error deleting post:', error);
+    alert('Failed to delete post. Please try again.');
   }
 };
 

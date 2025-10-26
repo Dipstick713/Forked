@@ -452,7 +452,9 @@
       const likedSet = new Set(likedPostIds)
       
       // Map posts to Card component format
-      posts.value = userPosts.map((post: any) => ({
+      posts.value = userPosts
+        .filter((post: any) => !post.deleted) // Filter out deleted posts
+        .map((post: any) => ({
         id: post._id,
         user: {
           id: post.author._id,
@@ -464,6 +466,7 @@
         time: formatTimeAgo(post.createdAt),
         image: post.image || '',
         liked: likedSet.has(post._id),
+        deleted: post.deleted || false,
         stats: {
           replies: post.stats?.replies || 0,
           reposts: post.stats?.forks || 0,

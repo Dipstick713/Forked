@@ -198,7 +198,12 @@ router.delete('/:id', requireAuth, async (req, res) => {
       return res.status(403).json({ message: 'Not authorized' });
     }
 
-    await Post.findByIdAndDelete(req.params.id);
+    // Soft delete: mark as deleted instead of removing from database
+    post.deleted = true;
+    post.content = '[deleted]';
+    post.image = null;
+    await post.save();
+
     res.json({ message: 'Post deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });

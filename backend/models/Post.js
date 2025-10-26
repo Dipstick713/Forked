@@ -23,6 +23,10 @@ const postSchema = new mongoose.Schema({
   image: { 
     type: String 
   },
+  deleted: {
+    type: Boolean,
+    default: false
+  },
   tags: [{ 
     type: String 
   }],
