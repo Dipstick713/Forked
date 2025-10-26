@@ -90,13 +90,11 @@ const createPost = async () => {
     
     if (selectedFile.value) {
       // Placeholder for image upload
-      console.log('Image upload not implemented yet:', selectedFile.value)
       // postData.image = await uploadImage(selectedFile.value)
     }
     
     // Create post via API
     const newPost = await postService.createPost(postData)
-    console.log('Post created successfully:', newPost)
     
     // Reset form
     postContent.value = ''

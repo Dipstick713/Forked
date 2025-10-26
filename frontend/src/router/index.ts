@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
-import PostView from '@/views/PostView.vue'
 import ProfileView from '@/views/ProfileView.vue'
 import FollowView from '@/views/FollowView.vue'
 import NewPostView from '@/views/NewPostView.vue'
@@ -16,14 +15,14 @@ const router = createRouter({
       component: HomeView,
     },
     {
-      path: '/post/:id',
-      name: 'post',
-      component: PostView,
-    },
-    {
       path: '/fork/:id',
       name: 'forkpost',
       component: ForkPostView,
+    },
+    {
+      path: '/:id/forks',
+      name: 'forks',
+      component: ForksView
     },
     {
       path: '/:user/followers',
@@ -39,11 +38,6 @@ const router = createRouter({
       path: '/:user/newpost',
       name: 'newpost',
       component: NewPostView
-    },
-    {
-      path: '/:post/forks',
-      name: 'forks',
-      component: ForksView
     },
     {
       path: '/:user',

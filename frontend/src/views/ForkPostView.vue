@@ -124,13 +124,11 @@ const createFork = async () => {
     
     // TODO: Handle image upload
     if (selectedFile.value) {
-      console.log('Image upload not implemented yet:', selectedFile.value)
       // forkData.image = await uploadImage(selectedFile.value)
     }
     
     // Create fork via API
     const newFork = await postService.createPost(forkData)
-    console.log('Fork created successfully:', newFork)
     
     // Reset form
     postContent.value = ''

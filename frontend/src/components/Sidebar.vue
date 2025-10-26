@@ -36,8 +36,7 @@ const logout = async () => {
     const success = await authService.logout();
     if (success) {
       user.value = null;
-      console.log('Logged out successfully');
-      // Optional: Redirect to home page after logout
+      // Redirect to home page after logout
       window.location.href = '/';
     }
   } catch (error) {

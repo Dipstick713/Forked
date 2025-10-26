@@ -613,7 +613,6 @@
       // Close modal
       showEditModal.value = false
       
-      console.log('Profile updated successfully')
     } catch (err: any) {
       console.error('Error updating profile:', err)
       error.value = 'Failed to update profile'

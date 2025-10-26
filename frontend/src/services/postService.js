@@ -41,6 +41,17 @@ export const postService = {
     }
   },
 
+  // Get forks for a post
+  async getPostForks(postId) {
+    try {
+      const response = await api.get(`/api/posts/${postId}/forks`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching forks:', error);
+      throw error;
+    }
+  },
+
   // Create new post
   async createPost(postData) {
     try {

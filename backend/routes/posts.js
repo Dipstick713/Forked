@@ -62,10 +62,23 @@ router.get('/:id/replies', async (req, res) => {
   }
 });
 
+// Get forks for a specific post
+router.get('/:id/forks', async (req, res) => {
+  try {
+    const forks = await Post.find({ parent: req.params.id })
+      .populate('author', 'username displayName avatarUrl')
+      .sort({ createdAt: -1 });
+
+    res.json(forks);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Create a new post
 router.post('/', requireAuth, async (req, res) => {
   try {
-    const { content, parentId, image } = req.body;
+    const { content, parentId, forkedFrom, image } = req.body;
 
     // Validate content
     if (!content || !content.trim()) {
@@ -82,20 +95,26 @@ router.post('/', requireAuth, async (req, res) => {
       image
     };
 
-    if (parentId) {
-      const parentPost = await Post.findById(parentId);
+    // Handle forkedFrom or parentId (they're the same thing)
+    const parentPostId = forkedFrom || parentId;
+    
+    if (parentPostId) {
+      const parentPost = await Post.findById(parentPostId);
       if (!parentPost) {
         return res.status(404).json({ message: 'Parent post not found' });
       }
-      postData.parent = parentId;
+      postData.parent = parentPostId;
       postData.seed = parentPost.seed;
+      
+      // Increment fork count on parent post
+      await Post.findByIdAndUpdate(parentPostId, { $inc: { 'stats.forks': 1 } });
     }
 
     const post = new Post(postData);
     const savedPost = await post.save();
     
     // For parent posts, set seed to its own _id
-    if (!parentId) {
+    if (!parentPostId) {
       savedPost.seed = savedPost._id;
       await savedPost.save();
     }
@@ -104,13 +123,13 @@ router.post('/', requireAuth, async (req, res) => {
     await savedPost.populate('author', 'username displayName avatarUrl');
 
     // Create notification if it's a reply/fork
-    if (parentId) {
-      const parentPost = await Post.findById(parentId);
+    if (parentPostId) {
+      const parentPost = await Post.findById(parentPostId);
       if (parentPost && parentPost.author.toString() !== req.user._id.toString()) {
         await Notification.create({
           recipient: parentPost.author,
           sender: req.user._id,
-          type: parentId ? 'fork' : 'reply',
+          type: 'fork',
           post: savedPost._id
         });
       }

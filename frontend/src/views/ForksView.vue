@@ -3,146 +3,184 @@
       <!-- Header -->
       <div class="sticky top-0 z-10 bg-[#0e0f10] p-4 border-b border-neutral-800 flex items-center">
         <button @click="goBack" class="mr-4">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd" />
-          </svg>
-          </button>
-          <h1 class="text-xl font-bold">Forked Posts</h1>
-        </div>
-        
-        <!-- Thread visualization with background visible -->
-        <div class="flex-1 overflow-y-auto px-4 py-2 scrollbar-hide space-y-4">
-          <!-- Parent post (blue) -->
-          <div v-if="parentPost" class="relative">
-            <div class="text-xs text-neutral-500 mb-2 pl-6">Parent Post</div>
-            <div class="relative pl-6">
-              <div class="absolute left-0 top-0 h-full w-0.5 bg-blue-500 rounded-full"></div>
-              <div class="bg-[#0e0f10] bg-opacity-70 backdrop-blur-sm rounded-xl border border-blue-500 border-opacity-30 p-4 shadow-lg">
-                <Card :post="parentPost" />
-              </div>
-            </div>
-          </div>
-          
-          <!-- Current post (green) -->
-          <div class="relative">
-            <div class="text-xs text-neutral-500 mb-2 pl-6">Current Post</div>
-            <div class="relative pl-6">
-              <div class="absolute left-0 top-0 h-full w-0.5 bg-green-500 rounded-full"></div>
-              <div class="bg-[#0e0f10] bg-opacity-70 backdrop-blur-sm rounded-xl border border-green-500 border-opacity-30 p-4 shadow-lg">
-                <Card :post="currentPost" />
-              </div>
-            </div>
-          </div>
-          
-          <!-- Child posts (neutral) -->
-          <div v-if="childPosts.length" class="space-y-4 pl-8">
-            <div class="text-xs text-neutral-500 mb-2 pl-6">Forked Posts ({{ childPosts.length }})</div>
-            <div v-for="(child, index) in childPosts" :key="child._id" class="relative pl-6">
-              <div class="absolute left-0 top-0 h-full w-0.5 bg-neutral-700 rounded-full"></div>
-              <div class="bg-[#0e0f10] bg-opacity-70 backdrop-blur-sm rounded-xl border border-neutral-800 p-4 shadow-lg">
-                <Card :post="child" />
-              </div>
-            </div>
-          </div>
-          <div v-else class="p-8 text-center text-neutral-500">
-            No connected posts yet. Start a new branch!
-          </div>
+          <ArrowLeft :size="20" />
+        </button>
+        <h1 class="text-xl font-bold">Post Thread</h1>
+      </div>
+
+      <!-- Loading State -->
+      <div v-if="isLoading" class="flex items-center justify-center p-20">
+        <div class="text-center">
+          <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500 mx-auto"></div>
+          <p class="text-neutral-500 mt-4">Loading thread...</p>
         </div>
       </div>
+
+      <!-- Error State -->
+      <div v-else-if="error" class="flex items-center justify-center p-20">
+        <div class="text-center">
+          <p class="text-red-500 mb-4">{{ error }}</p>
+          <button @click="fetchPostThread" class="bg-green-500 hover:bg-green-600 text-black px-4 py-2 rounded-full font-bold">
+            Try Again
+          </button>
+        </div>
+      </div>
+        
+      <!-- Thread visualization -->
+      <div v-else class="flex-1 overflow-y-auto px-4 py-2 scrollbar-hide space-y-4">
+        <!-- Parent post (blue) -->
+        <div v-if="parentPost" class="relative">
+          <div class="text-xs text-neutral-500 mb-2 pl-6">Parent Post</div>
+          <div class="relative pl-6">
+            <div class="absolute left-0 top-0 h-full w-0.5 bg-blue-500 rounded-full"></div>
+            <div class="bg-[#0e0f10] bg-opacity-70 backdrop-blur-sm rounded-xl border border-blue-500 border-opacity-30 p-4 shadow-lg">
+              <Card :post="parentPost" :currentUserId="currentUserId" />
+            </div>
+          </div>
+        </div>
+        
+        <!-- Current post (green) -->
+        <div v-if="currentPost" class="relative">
+          <div class="text-xs text-neutral-500 mb-2 pl-6">Current Post</div>
+          <div class="relative pl-6">
+            <div class="absolute left-0 top-0 h-full w-0.5 bg-green-500 rounded-full"></div>
+            <div class="bg-[#0e0f10] bg-opacity-70 backdrop-blur-sm rounded-xl border border-green-500 border-opacity-30 p-4 shadow-lg">
+              <Card :post="currentPost" :currentUserId="currentUserId" />
+            </div>
+          </div>
+        </div>
+        
+        <!-- Child posts (neutral) -->
+        <div v-if="childPosts.length" class="space-y-4 pl-8">
+          <div class="text-xs text-neutral-500 mb-2 pl-6">Forked Posts ({{ childPosts.length }})</div>
+          <div v-for="child in childPosts" :key="child.id" class="relative pl-6">
+            <div class="absolute left-0 top-0 h-full w-0.5 bg-neutral-700 rounded-full"></div>
+            <div class="bg-[#0e0f10] bg-opacity-70 backdrop-blur-sm rounded-xl border border-neutral-800 p-4 shadow-lg">
+              <Card :post="child" :currentUserId="currentUserId" />
+            </div>
+          </div>
+        </div>
+        <div v-else-if="currentPost" class="p-8 text-center text-neutral-500">
+          No forks yet. Be the first to fork this post!
+        </div>
+      </div>
+    </div>
   </template>
   
   <script setup lang="ts">
-  import { ref } from 'vue'
-  import { useRouter } from 'vue-router'
+  import { ref, onMounted } from 'vue'
+  import { useRouter, useRoute } from 'vue-router'
+  import { ArrowLeft } from 'lucide-vue-next'
   import Card from '@/components/Card.vue'
-  
-  // Hardcoded data
-  const currentPost = {
-    _id: '2',
-    content: "Social media creates connection illusions while actually isolating us. What do you think?",
-    authorId: 'user2',
-    parentId: '1',
-    threadId: '1',
-    createdAt: new Date(Date.now() - 3600000),
-    children: ['4', '5'],
-    user: {
-      name: 'Social Critic',
-      handle: 'critique42',
-      avatar: 'https://randomuser.me/api/portraits/women/33.jpg'
-    },
-    stats: {
-      replies: 2,
-      reposts: 3,
-      likes: 28
-    }
-  }
-  
-  const parentPost = {
-    _id: '1',
-    content: "Is loneliness a modern disease or just part of life?",
-    authorId: 'user1',
-    parentId: null,
-    threadId: '1',
-    createdAt: new Date(),
-    children: ['2', '3'],
-    user: {
-      name: 'Philosophy Fan',
-      handle: 'deep_thinker',
-      avatar: 'https://randomuser.me/api/portraits/men/22.jpg'
-    },
-    stats: {
-      replies: 2,
-      reposts: 5,
-      likes: 42
-    }
-  }
-  
-  const childPosts = [
-    {
-      _id: '4',
-      content: "The scale is different now - more people report chronic loneliness than ever before.",
-      authorId: 'user4',
-      parentId: '2',
-      threadId: '1',
-      createdAt: new Date(Date.now() - 1800000),
-      children: [],
-      user: {
-        name: 'Data Analyst',
-        handle: 'numbers_dont_lie',
-        avatar: 'https://randomuser.me/api/portraits/women/28.jpg'
-      },
-      stats: {
-        replies: 0,
-        reposts: 1,
-        likes: 9
-      }
-    },
-    {
-      _id: '5',
-      content: "I believe it's always been there but we're more aware of it now.",
-      authorId: 'user5',
-      parentId: '2',
-      threadId: '1',
-      createdAt: new Date(Date.now() - 1200000),
-      children: [],
-      user: {
-        name: 'History Buff',
-        handle: 'past_glances',
-        avatar: 'https://randomuser.me/api/portraits/men/45.jpg'
-      },
-      stats: {
-        replies: 0,
-        reposts: 2,
-        likes: 15
-      }
-    }
-  ]
-  
+  import { postService } from '@/services/postService'
+  import { authService } from '@/services/auth'
+  import { getUserLikedPosts } from '@/services/likeService'
+
   const router = useRouter()
-  
+  const route = useRoute()
+
+  const currentPost = ref<any>(null)
+  const parentPost = ref<any>(null)
+  const childPosts = ref<any[]>([])
+  const currentUserId = ref<string>('')
+  const isLoading = ref(true)
+  const error = ref<string | null>(null)
+
+  const formatTimeAgo = (dateString: string) => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000)
+
+    if (seconds < 60) return `${seconds}s`
+    const minutes = Math.floor(seconds / 60)
+    if (minutes < 60) return `${minutes}m`
+    const hours = Math.floor(minutes / 60)
+    if (hours < 24) return `${hours}h`
+    const days = Math.floor(hours / 24)
+    return `${days}d`
+  }
+
+  const mapPostData = (postData: any, likedSet: Set<string>) => {
+    return {
+      id: postData._id,
+      user: {
+        id: postData.author._id,
+        name: postData.author.displayName || postData.author.username,
+        handle: postData.author.username,
+        avatar: postData.author.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(postData.author.username)}&background=random`
+      },
+      content: postData.content,
+      image: postData.image || '',
+      time: formatTimeAgo(postData.createdAt),
+      createdAt: postData.createdAt,
+      liked: likedSet.has(postData._id),
+      stats: {
+        replies: postData.stats?.replies || 0,
+        reposts: postData.stats?.forks || 0,
+        likes: postData.stats?.likes || 0
+      }
+    }
+  }
+
+  const fetchPostThread = async () => {
+    isLoading.value = true
+    error.value = null
+
+    try {
+      const postId = route.params.id as string
+
+      // Fetch current user
+      let currentUserData = null
+      try {
+        const authResponse = await authService.getCurrentUser()
+        currentUserData = authResponse.user
+        currentUserId.value = authResponse.user._id || authResponse.user.id
+      } catch (err) {
+        // User not logged in
+      }
+
+      // Fetch liked posts
+      const likedPostIds = currentUserData ? await getUserLikedPosts().catch(() => []) : []
+      const likedSet = new Set(likedPostIds)
+
+      // Fetch the current post
+      const postData = await postService.getPost(postId)
+      currentPost.value = mapPostData(postData, likedSet)
+
+      // Fetch parent post if it exists (check for both 'parent' and 'forkedFrom')
+      const parentId = postData.parent?._id || postData.parent
+      if (parentId) {
+        try {
+          const parentData = await postService.getPost(parentId)
+          parentPost.value = mapPostData(parentData, likedSet)
+        } catch (err) {
+          // Failed to fetch parent
+        }
+      }
+
+      // Fetch child posts (posts that forked from this one)
+      try {
+        const childrenData = await postService.getPostForks(postId)
+        childPosts.value = childrenData.map((child: any) => mapPostData(child, likedSet))
+      } catch (err) {
+        // Failed to fetch forks
+        childPosts.value = []
+      }
+
+    } catch (err: any) {
+      error.value = err.response?.data?.message || 'Failed to load post thread'
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   const goBack = () => {
     router.go(-1)
   }
+
+  onMounted(() => {
+    fetchPostThread()
+  })
   </script>
   
   <style scoped>
@@ -163,27 +201,4 @@
   .backdrop-blur-sm {
     backdrop-filter: blur(4px);
   }
-  
-  .user-info {
-  min-width: 0;
-  flex: 1;
-}
-
-.user-name {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: block;
-  width: 100%;
-}
-
-.user-handle {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: block;
-  width: 100%;
-  color: #737373;
-  font-size: 0.875rem;
-}
-</style>
+  </style>

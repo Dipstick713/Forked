@@ -198,7 +198,7 @@ const goToProfile = () => {
 };
 
 const goToPost = () => {
-  router.push(`/post/${props.post.id}`);
+  router.push(`/${props.post.id}/forks`);
 };
 
 const goToFork = () => {
@@ -207,7 +207,7 @@ const goToFork = () => {
 
 const copyPostLink = async () => {
   try {
-    const postUrl = `${window.location.origin}/post/${props.post.id}`;
+    const postUrl = `${window.location.origin}/${props.post.id}/forks`;
     await navigator.clipboard.writeText(postUrl);
     copied.value = true;
     setTimeout(() => {
