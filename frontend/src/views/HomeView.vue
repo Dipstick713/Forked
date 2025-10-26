@@ -31,7 +31,8 @@
           <Card 
             v-for="post in posts" 
             :key="post.id" 
-            :post="post" 
+            :post="post"
+            :currentUserId="currentUserId"
           />
         </div>
 
@@ -50,9 +51,11 @@
 import { ref, onMounted } from 'vue'
 import Card from '@/components/Card.vue'
 import { postService } from '@/services/postService'
+import { authService } from '@/services/auth'
 import { getUserLikedPosts } from '@/services/likeService'
 
 const posts = ref([])
+const currentUserId = ref<string>('')
 const isLoading = ref(true)
 const error = ref<string | null>(null)
 
@@ -76,6 +79,14 @@ const fetchPosts = async () => {
   error.value = null
   
   try {
+    // Fetch current user
+    try {
+      const authResponse = await authService.getCurrentUser()
+      currentUserId.value = authResponse.user._id || authResponse.user.id
+    } catch (err) {
+      // User not logged in
+    }
+
     // Fetch posts and liked posts in parallel
     const [postsData, likedPostIds] = await Promise.all([
       postService.getPosts(),

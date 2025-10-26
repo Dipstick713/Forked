@@ -1,12 +1,12 @@
 <template>
-  <div class="p-4 border-b border-neutral-800 hover:bg-[#181a1d] transition-colors duration-200">
+  <div class="p-4 border-b border-neutral-800 hover:bg-[#181a1d] transition-colors duration-200 cursor-pointer" @click="goToPost">
     <div class="flex gap-3">
       <!-- Avatar -->
       <img 
         :src="post.user.avatar" 
         class="w-12 h-12 rounded-full object-cover border border-neutral-700 flex-shrink-0 cursor-pointer hover:opacity-90 transition"
         alt="User avatar"
-        @click="goToProfile"
+        @click.stop="goToProfile"
       >
 
       <!-- Content -->
@@ -16,11 +16,11 @@
           <div class="flex items-baseline min-w-0 max-w-[calc(100%-40px)]">
             <span 
               class="font-bold text-white truncate max-w-[120px] cursor-pointer hover:underline"
-              @click="goToProfile"
+              @click.stop="goToProfile"
             >{{ post.user.name }}</span>
             <span 
               class="text-neutral-500 truncate ml-1 cursor-pointer hover:underline"
-              @click="goToProfile"
+              @click.stop="goToProfile"
             >@{{ post.user.handle }}</span>
           </div>
           <span class="text-neutral-500 flex-shrink-0">·</span>
@@ -29,7 +29,7 @@
           <!-- Ellipsis Dropdown -->
           <div class="ml-auto relative flex-shrink-0">
             <button 
-              @click="showDropdown = !showDropdown"
+              @click.stop="showDropdown = !showDropdown"
               class="text-neutral-500 hover:text-white p-2 rounded-full hover:bg-neutral-800"
             >
               <Ellipsis/> 
@@ -44,7 +44,7 @@
                 <!-- Delete Option (only shown if current user is post author) -->
                 <button
                   v-if="isCurrentUserPost"
-                  @click="deletePost"
+                  @click.stop="deletePost"
                   class="flex items-center w-full px-4 py-2 text-sm text-red-500 hover:bg-neutral-800"
                 >
                   <Trash2 class="w-4 h-4 mr-2"/>
@@ -53,6 +53,7 @@
                 
                 <!-- Other options can be added here -->
                 <button
+                  @click.stop
                   class="flex items-center w-full px-4 py-2 text-sm text-white hover:bg-neutral-800"
                 >
                   <Flag class="w-4 h-4 mr-2"/>
@@ -64,14 +65,13 @@
         </div>
 
         <!-- Post Text -->
-        <p class="mt-1 text-white text-base cursor-pointer" @click="goToPost">{{ post.content }}</p>
+        <p class="mt-1 text-white text-base">{{ post.content }}</p>
 
         <!-- Image (optional) -->
         <img 
           v-if="post.image" 
           :src="post.image" 
-          class="mt-3 rounded-xl border border-neutral-800 max-h-80 w-full object-cover cursor-pointer"
-          @click="goToPost"
+          class="mt-3 rounded-xl border border-neutral-800 max-h-80 w-full object-cover"
         >
 
         <!-- Actions -->
@@ -79,7 +79,7 @@
           <!-- Fork -->
           <button 
             class="flex items-center gap-1 hover:text-green-500 group"
-            @click="goToFork"
+            @click.stop="goToFork"
           >
             <div class="p-2 rounded-full group-hover:bg-green-500/10">
               <GitBranch class="size-5"/>
@@ -91,7 +91,7 @@
           <button 
             class="flex items-center gap-1 group"
             :class="post.liked ? 'text-pink-500' : 'hover:text-pink-500'"
-            @click="toggleLike"
+            @click.stop="toggleLike"
           >
             <div class="p-2 rounded-full group-hover:bg-pink-500/10">
               <Heart :class="post.liked ? 'fill-current' : ''" class="size-5"/>
@@ -103,7 +103,7 @@
           <button 
             class="flex items-center gap-1 group relative"
             :class="copied ? 'text-green-500' : 'hover:text-blue-400'"
-            @click="copyPostLink"
+            @click.stop="copyPostLink"
           >
             <div class="p-2 rounded-full group-hover:bg-blue-400/10">
               <Check v-if="copied" class="size-5"/>

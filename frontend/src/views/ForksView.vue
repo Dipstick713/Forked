@@ -5,7 +5,7 @@
         <button @click="goBack" class="mr-4">
           <ArrowLeft :size="20" />
         </button>
-        <h1 class="text-xl font-bold">Post Thread</h1>
+        <h1 class="text-xl font-bold">Fork Thread</h1>
       </div>
 
       <!-- Loading State -->
@@ -33,7 +33,7 @@
           <div class="text-xs text-neutral-500 mb-2 pl-6">Parent Post</div>
           <div class="relative pl-6">
             <div class="absolute left-0 top-0 h-full w-0.5 bg-blue-500 rounded-full"></div>
-            <div class="bg-[#0e0f10] bg-opacity-70 backdrop-blur-sm rounded-xl border border-blue-500 border-opacity-30 p-4 shadow-lg">
+            <div class="bg-[#0e0f10] bg-opacity-70 backdrop-blur-sm rounded-xl border border-blue-500 border-opacity-30 shadow-lg">
               <Card :post="parentPost" :currentUserId="currentUserId" />
             </div>
           </div>
@@ -44,7 +44,7 @@
           <div class="text-xs text-neutral-500 mb-2 pl-6">Current Post</div>
           <div class="relative pl-6">
             <div class="absolute left-0 top-0 h-full w-0.5 bg-green-500 rounded-full"></div>
-            <div class="bg-[#0e0f10] bg-opacity-70 backdrop-blur-sm rounded-xl border border-green-500 border-opacity-30 p-4 shadow-lg">
+            <div class="bg-[#0e0f10] bg-opacity-70 backdrop-blur-sm rounded-xl border border-green-500 border-opacity-30 shadow-lg">
               <Card :post="currentPost" :currentUserId="currentUserId" />
             </div>
           </div>
@@ -55,7 +55,7 @@
           <div class="text-xs text-neutral-500 mb-2 pl-6">Forked Posts ({{ childPosts.length }})</div>
           <div v-for="child in childPosts" :key="child.id" class="relative pl-6">
             <div class="absolute left-0 top-0 h-full w-0.5 bg-neutral-700 rounded-full"></div>
-            <div class="bg-[#0e0f10] bg-opacity-70 backdrop-blur-sm rounded-xl border border-neutral-800 p-4 shadow-lg">
+            <div class="bg-[#0e0f10] bg-opacity-70 backdrop-blur-sm rounded-xl border border-neutral-800 shadow-lg">
               <Card :post="child" :currentUserId="currentUserId" />
             </div>
           </div>
@@ -68,7 +68,7 @@
   </template>
   
   <script setup lang="ts">
-  import { ref, onMounted } from 'vue'
+  import { ref, onMounted, watch } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
   import { ArrowLeft } from 'lucide-vue-next'
   import Card from '@/components/Card.vue'
@@ -129,6 +129,11 @@
     try {
       const postId = route.params.id as string
 
+      // Reset state
+      currentPost.value = null
+      parentPost.value = null
+      childPosts.value = []
+
       // Fetch current user
       let currentUserData = null
       try {
@@ -154,7 +159,7 @@
           const parentData = await postService.getPost(parentId)
           parentPost.value = mapPostData(parentData, likedSet)
         } catch (err) {
-          // Failed to fetch parent
+          console.error('Failed to fetch parent:', err)
         }
       }
 
@@ -163,11 +168,12 @@
         const childrenData = await postService.getPostForks(postId)
         childPosts.value = childrenData.map((child: any) => mapPostData(child, likedSet))
       } catch (err) {
-        // Failed to fetch forks
+        console.error('Failed to fetch forks:', err)
         childPosts.value = []
       }
 
     } catch (err: any) {
+      console.error('Error loading thread:', err)
       error.value = err.response?.data?.message || 'Failed to load post thread'
     } finally {
       isLoading.value = false
@@ -180,6 +186,13 @@
 
   onMounted(() => {
     fetchPostThread()
+  })
+
+  // Watch for route parameter changes to refetch thread
+  watch(() => route.params.id, (newId, oldId) => {
+    if (newId && newId !== oldId) {
+      fetchPostThread()
+    }
   })
   </script>
   
