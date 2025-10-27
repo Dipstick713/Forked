@@ -10,7 +10,8 @@ const api = {
       },
     });
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const error = await response.json().catch(() => ({ message: 'Request failed' }));
+      throw new Error(error.message || `HTTP error! status: ${response.status}`);
     }
     return response.json();
   },
@@ -25,7 +26,8 @@ const api = {
       body: JSON.stringify(data),
     });
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const error = await response.json().catch(() => ({ message: 'Request failed' }));
+      throw new Error(error.message || `HTTP error! status: ${response.status}`);
     }
     return response.json();
   },
@@ -40,7 +42,8 @@ const api = {
       body: JSON.stringify(data),
     });
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const error = await response.json().catch(() => ({ message: 'Request failed' }));
+      throw new Error(error.message || `HTTP error! status: ${response.status}`);
     }
     return response.json();
   },
@@ -54,7 +57,8 @@ const api = {
       },
     });
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      const error = await response.json().catch(() => ({ message: 'Request failed' }));
+      throw new Error(error.message || `HTTP error! status: ${response.status}`);
     }
     return response.json();
   },

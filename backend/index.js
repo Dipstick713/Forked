@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const session = require('express-session');
+const MongoStore = require('connect-mongo');
 const connectDB = require('./config/database');
 require('dotenv').config();
 
@@ -19,6 +20,11 @@ const passport = require('./passport');
 // Connect to database
 connectDB();
 
+// Trust proxy - CRITICAL for production (Render, Heroku, etc.)
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+}
+
 // Middleware
 const corsOrigin = process.env.FRONTEND_URL || "http://localhost:5173";
 
@@ -34,6 +40,10 @@ app.use(
     secret: process.env.SESSION_SECRET || "devsecret",
     resave: false,
     saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGO_URI,
+      touchAfter: 24 * 3600 // lazy session update
+    }),
     cookie: {
       secure: process.env.NODE_ENV === "production",
       httpOnly: true,
