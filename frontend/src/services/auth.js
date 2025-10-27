@@ -1,12 +1,6 @@
-import axios from 'axios';
+import api from '../api/axios';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-
-// Create axios instance with credentials
-const api = axios.create({
-  baseURL: API_BASE,
-  withCredentials: true,
-});
 
 export const authService = {
   // Redirect to GitHub login
@@ -17,8 +11,8 @@ export const authService = {
   // Check if user is logged in
   async getCurrentUser() {
     try {
-      const response = await api.get('/auth/user');
-      return response.data;
+      const data = await api.get('/auth/user');
+      return data;
     } catch (error) {
       console.error('Error fetching user:', error);
       return { user: null };

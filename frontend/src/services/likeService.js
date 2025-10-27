@@ -1,15 +1,11 @@
-import axios from 'axios';
-
-const API_URL = `${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api`;
-
-axios.defaults.withCredentials = true;
+import api from '../api/axios';
 
 export const likePost = async (postId) => {
   try {
-    const response = await axios.put(`${API_URL}/posts/${postId}/like`, {
+    const data = await api.put(`/api/posts/${postId}/like`, {
       action: 'like'
     });
-    return response.data;
+    return data;
   } catch (error) {
     throw error.response?.data || error;
   }
@@ -17,10 +13,10 @@ export const likePost = async (postId) => {
 
 export const unlikePost = async (postId) => {
   try {
-    const response = await axios.put(`${API_URL}/posts/${postId}/like`, {
+    const data = await api.put(`/api/posts/${postId}/like`, {
       action: 'unlike'
     });
-    return response.data;
+    return data;
   } catch (error) {
     throw error.response?.data || error;
   }
@@ -28,8 +24,8 @@ export const unlikePost = async (postId) => {
 
 export const getUserLikedPosts = async () => {
   try {
-    const response = await axios.get(`${API_URL}/likes/my-likes`);
-    return response.data;
+    const data = await api.get('/api/likes/my-likes');
+    return data;
   } catch (error) {
     throw error.response?.data || error;
   }
@@ -37,8 +33,8 @@ export const getUserLikedPosts = async () => {
 
 export const getUserLikedPostsWithDetails = async (userId) => {
   try {
-    const response = await axios.get(`${API_URL}/likes/user/${userId}`);
-    return response.data;
+    const data = await api.get(`/api/likes/user/${userId}`);
+    return data;
   } catch (error) {
     throw error.response?.data || error;
   }

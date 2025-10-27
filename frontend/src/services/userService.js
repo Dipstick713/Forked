@@ -1,18 +1,11 @@
-import axios from 'axios';
-
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-
-const api = axios.create({
-  baseURL: API_BASE,
-  withCredentials: true,
-});
+import api from '../api/axios';
 
 export const userService = {
   // Search users by query
   async searchUsers(query) {
     try {
-      const response = await api.get(`/api/users/search/${encodeURIComponent(query)}`);
-      return response.data;
+      const data = await api.get(`/api/users/search/${encodeURIComponent(query)}`);
+      return data;
     } catch (error) {
       console.error('Error searching users:', error);
       throw error;
@@ -22,8 +15,8 @@ export const userService = {
   // Get user by ID
   async getUserById(userId) {
     try {
-      const response = await api.get(`/api/users/${userId}`);
-      return response.data;
+      const data = await api.get(`/api/users/${userId}`);
+      return data;
     } catch (error) {
       console.error('Error fetching user by ID:', error);
       throw error;
@@ -33,8 +26,8 @@ export const userService = {
   // Get user by username
   async getUserByUsername(username) {
     try {
-      const response = await api.get(`/api/users/username/${username}`);
-      return response.data;
+      const data = await api.get(`/api/users/username/${username}`);
+      return data;
     } catch (error) {
       console.error('Error fetching user by username:', error);
       throw error;
@@ -44,10 +37,9 @@ export const userService = {
   // Get user's posts
   async getUserPosts(userId, page = 1, limit = 20) {
     try {
-      const response = await api.get(`/api/users/${userId}/posts`, {
-        params: { page, limit }
-      });
-      return response.data;
+      const queryString = new URLSearchParams({ page, limit }).toString();
+      const data = await api.get(`/api/users/${userId}/posts?${queryString}`);
+      return data;
     } catch (error) {
       console.error('Error fetching user posts:', error);
       throw error;
@@ -57,8 +49,8 @@ export const userService = {
   // Get current user profile
   async getCurrentUserProfile() {
     try {
-      const response = await api.get('/api/users/profile/me');
-      return response.data;
+      const data = await api.get('/api/users/profile/me');
+      return data;
     } catch (error) {
       console.error('Error fetching current user profile:', error);
       throw error;
@@ -84,12 +76,12 @@ export const userService = {
           payload.bannerUrl = await this.fileToBase64(profileData.banner);
         }
         
-        const response = await api.put('/api/users/profile', payload);
-        return response.data;
+        const data = await api.put('/api/users/profile', payload);
+        return data;
       } else {
         // Send as regular JSON if no files
-        const response = await api.put('/api/users/profile', profileData);
-        return response.data;
+        const data = await api.put('/api/users/profile', profileData);
+        return data;
       }
     } catch (error) {
       console.error('Error updating profile:', error);

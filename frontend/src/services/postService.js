@@ -1,18 +1,13 @@
-import axios from 'axios';
-
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-
-const api = axios.create({
-  baseURL: API_BASE,
-  withCredentials: true,
-});
+import api from '../api/axios';
 
 export const postService = {
   // Get all posts
   async getPosts(params = {}) {
     try {
-      const response = await api.get('/api/posts', { params });
-      return response.data;
+      const queryString = new URLSearchParams(params).toString();
+      const endpoint = queryString ? `/api/posts?${queryString}` : '/api/posts';
+      const data = await api.get(endpoint);
+      return data;
     } catch (error) {
       console.error('Error fetching posts:', error);
       throw error;
@@ -22,8 +17,8 @@ export const postService = {
   // Get a specific post
   async getPost(postId) {
     try {
-      const response = await api.get(`/api/posts/${postId}`);
-      return response.data;
+      const data = await api.get(`/api/posts/${postId}`);
+      return data;
     } catch (error) {
       console.error('Error fetching post:', error);
       throw error;
@@ -33,8 +28,8 @@ export const postService = {
   // Get replies for a post
   async getPostReplies(postId) {
     try {
-      const response = await api.get(`/api/posts/${postId}/replies`);
-      return response.data;
+      const data = await api.get(`/api/posts/${postId}/replies`);
+      return data;
     } catch (error) {
       console.error('Error fetching replies:', error);
       throw error;
@@ -44,8 +39,8 @@ export const postService = {
   // Get forks for a post
   async getPostForks(postId) {
     try {
-      const response = await api.get(`/api/posts/${postId}/forks`);
-      return response.data;
+      const data = await api.get(`/api/posts/${postId}/forks`);
+      return data;
     } catch (error) {
       console.error('Error fetching forks:', error);
       throw error;
@@ -69,12 +64,12 @@ export const postService = {
           payload.parentId = postData.parentId;
         }
         
-        const response = await api.post('/api/posts', payload);
-        return response.data;
+        const data = await api.post('/api/posts', payload);
+        return data;
       } else {
         // Send as regular JSON if no file
-        const response = await api.post('/api/posts', postData);
-        return response.data;
+        const data = await api.post('/api/posts', postData);
+        return data;
       }
     } catch (error) {
       console.error('Error creating post:', error);
@@ -95,8 +90,8 @@ export const postService = {
   // Like/unlike post
   async likePost(postId, action) {
     try {
-      const response = await api.put(`/api/posts/${postId}/like`, { action });
-      return response.data;
+      const data = await api.put(`/api/posts/${postId}/like`, { action });
+      return data;
     } catch (error) {
       console.error('Error liking post:', error);
       throw error;
@@ -106,8 +101,8 @@ export const postService = {
   // Delete post
   async deletePost(postId) {
     try {
-      const response = await api.delete(`/api/posts/${postId}`);
-      return response.data;
+      const data = await api.delete(`/api/posts/${postId}`);
+      return data;
     } catch (error) {
       console.error('Error deleting post:', error);
       throw error;
