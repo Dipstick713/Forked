@@ -3,6 +3,31 @@ const User = require('../models/User');
 const Post = require('../models/Post');
 const router = express.Router();
 
+// Search users by username or display name
+router.get('/search/:query', async (req, res) => {
+  try {
+    const query = req.params.query;
+    
+    if (!query || query.trim().length === 0) {
+      return res.json([]);
+    }
+
+    // Search for users matching the query (case-insensitive)
+    const users = await User.find({
+      $or: [
+        { username: { $regex: query, $options: 'i' } },
+        { displayName: { $regex: query, $options: 'i' } }
+      ]
+    })
+    .select('username displayName avatarUrl bio')
+    .limit(10);
+
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // Get all users (for testing)
 router.get('/', async (req, res) => {
   try {

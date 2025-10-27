@@ -1,21 +1,27 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { Search, X } from 'lucide-vue-next'
+import { userService } from '@/services/userService'
 
 type User = {
-  id: string
-  name: string
-  handle: string
-  avatar: string
+  _id: string
+  username: string
+  displayName?: string
+  avatarUrl: string
   bio?: string
 }
 
+const router = useRouter()
 const searchQuery = ref('')
 const isFocused = ref(false)
 const isLoading = ref(false)
 const searchResults = ref<User[]>([])
 
-// Mock search function - replace with actual API call
+// Debounce timer
+let debounceTimer: ReturnType<typeof setTimeout> | null = null
+
+// Search users function
 const searchUsers = async (query: string) => {
   if (!query.trim()) {
     searchResults.value = []
@@ -24,31 +30,15 @@ const searchUsers = async (query: string) => {
 
   isLoading.value = true
   
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 500))
-  
-  // Mock data - replace with actual API response
-  searchResults.value = [
-    {
-      id: '1',
-      name: 'John Doe',
-      handle: 'johndoe',
-      avatar: 'https://randomuser.me/api/portraits/men/1.jpg',
-      bio: 'Digital creator | Coffee enthusiast',
-    },
-    {
-      id: '2',
-      name: 'Jane Smith',
-      handle: 'janesmith',
-      avatar: 'https://randomuser.me/api/portraits/women/1.jpg',
-      bio: 'Web developer | Open source contributor'
-    }
-  ].filter(user => 
-    user.name.toLowerCase().includes(query.toLowerCase()) || 
-    user.handle.toLowerCase().includes(query.toLowerCase())
-  )
-  
-  isLoading.value = false
+  try {
+    const users = await userService.searchUsers(query)
+    searchResults.value = users
+  } catch (error) {
+    console.error('Error searching users:', error)
+    searchResults.value = []
+  } finally {
+    isLoading.value = false
+  }
 }
 
 const clearSearch = () => {
@@ -56,9 +46,21 @@ const clearSearch = () => {
   searchResults.value = []
 }
 
+const goToProfile = (username: string) => {
+  router.push(`/${username}`)
+  clearSearch()
+  isFocused.value = false
+}
+
 // Debounce search input
 watch(searchQuery, (newQuery) => {
-  searchUsers(newQuery)
+  if (debounceTimer) {
+    clearTimeout(debounceTimer)
+  }
+  
+  debounceTimer = setTimeout(() => {
+    searchUsers(newQuery)
+  }, 300)
 })
 </script>
 
@@ -105,20 +107,21 @@ watch(searchQuery, (newQuery) => {
       <ul v-else class="divide-y divide-neutral-800 max-h-96 overflow-y-auto">
         <li
           v-for="user in searchResults"
-          :key="user.id"
+          :key="user._id"
+          @click="goToProfile(user.username)"
           class="p-3 hover:bg-[#1e2124] transition cursor-pointer"
         >
           <div class="flex items-center space-x-3">
             <img
-              :src="user.avatar"
+              :src="user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.username)}&background=random`"
               class="h-10 w-10 rounded-full object-cover border border-neutral-700"
-              :alt="user.name"
+              :alt="user.displayName || user.username"
             >
             <div class="flex-1 min-w-0">
               <div class="flex items-center space-x-1">
-                <p class="font-medium text-white truncate">{{ user.name }}</p>
+                <p class="font-medium text-white truncate">{{ user.displayName || user.username }}</p>
               </div>
-              <p class="text-sm text-neutral-500 truncate">@{{ user.handle }}</p>
+              <p class="text-sm text-neutral-500 truncate">@{{ user.username }}</p>
               <p v-if="user.bio" class="text-sm text-neutral-400 mt-1 truncate">{{ user.bio }}</p>
             </div>
           </div>

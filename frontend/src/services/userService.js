@@ -8,6 +8,17 @@ const api = axios.create({
 });
 
 export const userService = {
+  // Search users by query
+  async searchUsers(query) {
+    try {
+      const response = await api.get(`/api/users/search/${encodeURIComponent(query)}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error searching users:', error);
+      throw error;
+    }
+  },
+
   // Get user by ID
   async getUserById(userId) {
     try {
