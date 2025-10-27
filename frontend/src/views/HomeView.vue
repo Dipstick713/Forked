@@ -11,7 +11,7 @@
     </div>
       
       <!-- Scrollable posts container -->
-      <div class="flex-1 overflow-y-auto px-4 py-2 scrollbar-hide">
+      <div ref="scrollContainer" class="flex-1 overflow-y-auto px-4 py-2 scrollbar-hide">
         <!-- Loading State -->
         <div v-if="isLoading" class="flex items-center justify-center p-20">
           <div class="text-center">
@@ -47,12 +47,26 @@
         </div>
       </div>
 
+      <!-- Scroll to Top Button -->
+      <transition name="fade">
+        <button
+          v-if="showScrollTop"
+          @click="scrollToTop"
+          class="fixed bottom-6 right-6 bg-green-500 hover:bg-green-600 text-black p-3 rounded-full shadow-lg transition-all transform hover:scale-110 z-50"
+          aria-label="Scroll to top"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m18 15-6-6-6 6"/>
+          </svg>
+        </button>
+      </transition>
+
   </div>
 </template>
 
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { VueSpinnerOrbit } from 'vue3-spinners'
 import Card from '@/components/Card.vue'
 import MobileMenuButton from '@/components/MobileMenuButton.vue'
@@ -63,10 +77,14 @@ import { getUserLikedPosts } from '@/services/likeService'
 
 defineEmits(['toggleSidebar'])
 
-const posts = ref([])
+const posts = ref<any[]>([])
 const currentUserId = ref<string>('')
 const isLoading = ref(true)
 const error = ref<string | null>(null)
+
+// Scroll to top state
+const showScrollTop = ref(false)
+const scrollContainer = ref<HTMLElement | null>(null)
 
 // Format time helper
 const formatTimeAgo = (dateString: string) => {
@@ -127,6 +145,7 @@ const fetchPosts = async () => {
         likes: post.stats?.likes || 0
       }
     }))
+    
   } catch (err: any) {
     console.error('Error fetching posts:', err)
     error.value = 'Failed to load posts. Please try again.'
@@ -135,8 +154,37 @@ const fetchPosts = async () => {
   }
 }
 
+// Scroll to top functionality
+const scrollToTop = () => {
+  if (scrollContainer.value) {
+    scrollContainer.value.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    })
+  }
+}
+
+// Handle scroll event to show/hide scroll-to-top button
+const handleScroll = () => {
+  if (scrollContainer.value) {
+    showScrollTop.value = scrollContainer.value.scrollTop > 300
+  }
+}
+
 onMounted(() => {
   fetchPosts()
+  
+  // Add scroll listener
+  if (scrollContainer.value) {
+    scrollContainer.value.addEventListener('scroll', handleScroll)
+  }
+})
+
+onUnmounted(() => {
+  // Remove scroll listener
+  if (scrollContainer.value) {
+    scrollContainer.value.removeEventListener('scroll', handleScroll)
+  }
 })
 </script>
 
@@ -148,5 +196,13 @@ onMounted(() => {
 .scrollbar-hide {
   -ms-overflow-style: none; 
   scrollbar-width: none; 
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
 }
 </style>

@@ -9,9 +9,9 @@ const api = axios.create({
 
 export const postService = {
   // Get all posts
-  async getPosts() {
+  async getPosts(params = {}) {
     try {
-      const response = await api.get('/api/posts');
+      const response = await api.get('/api/posts', { params });
       return response.data;
     } catch (error) {
       console.error('Error fetching posts:', error);
