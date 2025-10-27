@@ -146,12 +146,14 @@ import {
 } from 'lucide-vue-next';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { useToast } from 'vue-toastification';
 import { likePost, unlikePost } from '../services/likeService';
 import { postService } from '../services/postService';
 import { authService } from '../services/auth';
 import ConfirmDialog from './ConfirmDialog.vue';
 
 const router = useRouter();
+const toast = useToast();
 
 const props = defineProps({
   post: {
@@ -204,9 +206,14 @@ const confirmDelete = async () => {
     props.post.deleted = true;
     props.post.content = '[deleted]';
     props.post.image = '';
+    
+    // Show success toast
+    toast.success('Post deleted successfully', {
+      timeout: 2000
+    });
   } catch (error) {
     console.error('Error deleting post:', error);
-    alert('Failed to delete post. Please try again.');
+    toast.error('Failed to delete post. Please try again.');
   }
 };
 

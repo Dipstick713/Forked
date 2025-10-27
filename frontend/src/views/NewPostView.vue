@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { useToast } from 'vue-toastification'
 import { Image, X, ArrowLeft } from 'lucide-vue-next'
 import { postService } from '@/services/postService'
 import { authService } from '@/services/auth'
 
 const router = useRouter()
+const toast = useToast()
 const postContent = ref('')
 const isPosting = ref(false)
 const selectedFile = ref<File | null>(null)
@@ -96,6 +98,11 @@ const createPost = async () => {
     // Create post via API
     const newPost = await postService.createPost(postData)
     
+    // Show success toast
+    toast.success('Post created successfully!', {
+      timeout: 2000
+    });
+    
     // Reset form
     postContent.value = ''
     removeImage()
@@ -106,11 +113,13 @@ const createPost = async () => {
     console.error('Error creating post:', err)
     if (err.response?.status === 401) {
       error.value = 'Your session has expired. Please log in again.'
+      toast.error('Session expired. Please log in again.');
       setTimeout(() => {
         window.location.href = 'http://localhost:3000/auth/github'
       }, 2000)
     } else {
       error.value = err.response?.data?.message || 'Failed to create post. Please try again.'
+      toast.error(error.value);
     }
   } finally {
     isPosting.value = false

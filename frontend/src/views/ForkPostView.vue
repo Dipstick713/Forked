@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useToast } from 'vue-toastification'
 import { Image, X, ArrowLeft, GitBranch } from 'lucide-vue-next'
 import { VueSpinnerOrbit } from 'vue3-spinners'
 import { postService } from '@/services/postService'
@@ -8,6 +9,7 @@ import { authService } from '@/services/auth'
 
 const router = useRouter()
 const route = useRoute()
+const toast = useToast()
 const postContent = ref('')
 const isPosting = ref(false)
 const selectedFile = ref<File | null>(null)
@@ -131,6 +133,9 @@ const createFork = async () => {
     // Create fork via API
     const newFork = await postService.createPost(forkData)
     
+    // Show success toast
+    toast.success('Fork created successfully!', { timeout: 2000 })
+    
     // Reset form
     postContent.value = ''
     removeImage()
@@ -141,11 +146,13 @@ const createFork = async () => {
     console.error('Error creating fork:', err)
     if (err.response?.status === 401) {
       error.value = 'Your session has expired. Please log in again.'
+      toast.error('Session expired. Redirecting to login...')
       setTimeout(() => {
         window.location.href = 'http://localhost:3000/auth/github'
       }, 2000)
     } else {
       error.value = err.response?.data?.message || 'Failed to create fork. Please try again.'
+      toast.error(error.value)
     }
   } finally {
     isPosting.value = false
