@@ -20,7 +20,7 @@ const passport = require('./passport');
 connectDB();
 
 // Middleware
-const corsOrigin = process.env.FRONTEND_URL || 'http://localhost:5173';
+const corsOrigin = 'https://forked-five.vercel.app/';
 
 app.use(cors({
   origin: corsOrigin,
