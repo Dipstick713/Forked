@@ -52,8 +52,19 @@
         
         <!-- Child posts (neutral) -->
         <div v-if="childPosts.length" class="space-y-4 pl-8">
-          <div class="text-xs text-neutral-500 mb-2 pl-6">Forked Posts ({{ childPosts.length }})</div>
-          <div v-for="child in childPosts" :key="child.id" class="relative pl-6">
+          <div class="flex items-center justify-between mb-2 pl-6">
+            <div class="text-xs text-neutral-500">Forked Posts ({{ sortedChildPosts.length }})</div>
+            <select 
+              v-model="sortBy" 
+              class="text-xs bg-zinc-900 border border-neutral-700 rounded-lg px-3 py-1.5 text-neutral-300 focus:outline-none focus:border-zinc-500 transition-colors"
+            >
+              <option value="date-desc">Newest First</option>
+              <option value="date-asc">Oldest First</option>
+              <option value="likes-desc">Most Liked</option>
+              <option value="likes-asc">Least Liked</option>
+            </select>
+          </div>
+          <div v-for="child in sortedChildPosts" :key="child.id" class="relative pl-6">
             <div class="absolute left-0 top-0 h-full w-0.5 bg-zinc-700 rounded-full"></div>
             <div class="bg-[#0e0f10] bg-opacity-70 backdrop-blur-sm rounded-xl border border-neutral-800 shadow-lg">
               <Card :post="child" :currentUserId="currentUserId" />
@@ -68,7 +79,7 @@
   </template>
   
   <script setup lang="ts">
-  import { ref, onMounted, watch } from 'vue'
+  import { ref, onMounted, watch, computed } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
   import { ArrowLeft } from 'lucide-vue-next'
   import { VueSpinnerOrbit } from 'vue3-spinners'
@@ -86,6 +97,25 @@
   const currentUserId = ref<string>('')
   const isLoading = ref(true)
   const error = ref<string | null>(null)
+  const sortBy = ref<string>('date-desc')
+
+  // Computed property to sort child posts
+  const sortedChildPosts = computed(() => {
+    const posts = [...childPosts.value]
+    
+    switch (sortBy.value) {
+      case 'date-desc':
+        return posts.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      case 'date-asc':
+        return posts.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+      case 'likes-desc':
+        return posts.sort((a, b) => b.stats.likes - a.stats.likes)
+      case 'likes-asc':
+        return posts.sort((a, b) => a.stats.likes - b.stats.likes)
+      default:
+        return posts
+    }
+  })
 
   const formatTimeAgo = (dateString: string) => {
     const date = new Date(dateString)
