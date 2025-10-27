@@ -594,7 +594,7 @@
   const toggleFollow = async () => {
     if (!currentUser.value) {
       // Redirect to login
-      window.location.href = 'http://localhost:3000/auth/github'
+      authService.loginWithGitHub()
       return
     }
 

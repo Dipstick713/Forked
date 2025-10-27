@@ -104,7 +104,7 @@ const createFork = async () => {
   if (!currentUser.value) {
     error.value = 'You must be logged in to fork a post'
     setTimeout(() => {
-      window.location.href = 'http://localhost:3000/auth/github'
+      authService.loginWithGitHub()
     }, 1500)
     return
   }
@@ -148,7 +148,7 @@ const createFork = async () => {
       error.value = 'Your session has expired. Please log in again.'
       toast.error('Session expired. Redirecting to login...')
       setTimeout(() => {
-        window.location.href = 'http://localhost:3000/auth/github'
+        authService.loginWithGitHub()
       }, 2000)
     } else {
       error.value = err.response?.data?.message || 'Failed to create fork. Please try again.'

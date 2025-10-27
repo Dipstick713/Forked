@@ -21,7 +21,7 @@ const goToNewPost = () => {
     router.push(`/${currentUser.value.username}/newpost`);
   } else {
     // Fallback to login or home if not authenticated
-    window.location.href = 'http://localhost:3000/auth/github';
+    authService.loginWithGitHub();
   }
 };
 </script>
@@ -46,12 +46,12 @@ const goToNewPost = () => {
     <div v-else class="bg-[#16181a] border border-neutral-800 rounded-xl p-6">
       <h3 class="text-lg font-bold text-white mb-2">New to Forked?</h3>
       <p class="text-neutral-400 text-sm mb-4">Sign in to start forking discussions and sharing ideas.</p>
-      <a
-        href="http://localhost:3000/auth/github"
-        class="block text-center bg-green-500 hover:bg-green-600 text-black font-semibold py-2 px-4 rounded-full transition"
+      <button
+        @click="authService.loginWithGitHub()"
+        class="block w-full text-center bg-green-500 hover:bg-green-600 text-black font-semibold py-2 px-4 rounded-full transition"
       >
         Sign in with GitHub
-      </a>
+      </button>
     </div>
   </aside>
 </template>

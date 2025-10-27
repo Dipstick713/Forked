@@ -65,7 +65,7 @@ const createPost = async () => {
     error.value = 'You must be logged in to create a post'
     // Redirect to GitHub OAuth login
     setTimeout(() => {
-      window.location.href = 'http://localhost:3000/auth/github'
+      authService.loginWithGitHub()
     }, 1500)
     return
   }
@@ -110,7 +110,7 @@ const createPost = async () => {
       error.value = 'Your session has expired. Please log in again.'
       toast.error('Session expired. Please log in again.');
       setTimeout(() => {
-        window.location.href = 'http://localhost:3000/auth/github'
+        authService.loginWithGitHub()
       }, 2000)
     } else {
       error.value = err.response?.data?.message || 'Failed to create post. Please try again.'

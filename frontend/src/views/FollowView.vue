@@ -264,7 +264,7 @@ const fetchFollowData = async () => {
 
 const toggleFollow = async (targetUser: User, listType: 'followers' | 'following') => {
   if (!currentUser.value) {
-    window.location.href = 'http://localhost:3000/auth/github'
+    authService.loginWithGitHub()
     return
   }
 
