@@ -20,7 +20,7 @@
         <button 
           v-for="tab in tabs"
           :key="tab.value"
-          @click="switchTab(tab.value)"
+          @click="switchTab(tab.value as 'followers' | 'following')"
           :class="{
             'font-bold text-white': activeTab === tab.value,
             'text-neutral-500': activeTab !== tab.value
@@ -173,8 +173,8 @@ type User = {
 }
 
 const tabs = [
-  { label: 'Followers', value: 'followers' },
-  { label: 'Following', value: 'following' }
+  { label: 'Followers', value: 'followers' as const },
+  { label: 'Following', value: 'following' as const }
 ]
 
 const activeTab = ref<'followers' | 'following'>(

@@ -19,6 +19,13 @@ const isFocused = ref(false)
 const isLoading = ref(false)
 const searchResults = ref<User[]>([])
 
+// Handle blur with delay to allow click on results
+const handleBlur = () => {
+  setTimeout(() => {
+    isFocused.value = false
+  }, 200)
+}
+
 // Debounce timer
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
 
@@ -75,7 +82,7 @@ watch(searchQuery, (newQuery) => {
       <input
         v-model="searchQuery"
         @focus="isFocused = true"
-        @blur="setTimeout(() => isFocused = false, 200)"
+        @blur="handleBlur"
         type="text"
         placeholder="Search users..."
         class="block w-full pl-10 pr-12 py-2 bg-[#15181b] border border-[#494b5e] rounded-full text-white placeholder-neutral-500 focus:outline-none focus:ring-1 focus:ring-green-500 focus:border-green-500 transition"

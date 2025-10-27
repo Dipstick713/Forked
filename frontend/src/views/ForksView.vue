@@ -186,7 +186,7 @@
 
       // Fetch liked posts
       const likedPostIds = currentUserData ? await getUserLikedPosts().catch(() => []) : []
-      const likedSet = new Set(likedPostIds)
+      const likedSet = new Set<string>(likedPostIds as string[])
 
       // Fetch the current post
       const postData = await postService.getPost(postId)

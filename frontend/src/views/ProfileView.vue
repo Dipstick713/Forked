@@ -375,8 +375,8 @@
     bannerFile: null as File | null
   })
   
-  const posts = ref([])
-  const likedPosts = ref([])
+  const posts = ref<any[]>([])
+  const likedPosts = ref<any[]>([])
   const isLoadingLikes = ref(false)
 
   // Check if viewing own profile
