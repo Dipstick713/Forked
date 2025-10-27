@@ -20,8 +20,10 @@ const passport = require('./passport');
 connectDB();
 
 // Middleware
+const corsOrigin = process.env.FRONTEND_URL || 'http://localhost:5173';
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: corsOrigin,
   credentials: true
 }));
 app.use(express.json({ limit: '10mb' })); // Increased limit for base64 images
