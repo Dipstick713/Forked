@@ -11,7 +11,7 @@
       <!-- Loading State -->
       <div v-if="isLoading" class="flex items-center justify-center p-20">
         <div class="text-center">
-          <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500 mx-auto"></div>
+          <VueSpinnerOrbit :size="60" color="#22c55e" />
           <p class="text-neutral-500 mt-4">Loading thread...</p>
         </div>
       </div>
@@ -71,6 +71,7 @@
   import { ref, onMounted, watch } from 'vue'
   import { useRouter, useRoute } from 'vue-router'
   import { ArrowLeft } from 'lucide-vue-next'
+  import { VueSpinnerOrbit } from 'vue3-spinners'
   import Card from '@/components/Card.vue'
   import { postService } from '@/services/postService'
   import { authService } from '@/services/auth'

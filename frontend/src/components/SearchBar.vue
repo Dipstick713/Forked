@@ -2,6 +2,7 @@
 import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { Search, X } from 'lucide-vue-next'
+import { VueSpinnerDots } from 'vue3-spinners'
 import { userService } from '@/services/userService'
 
 type User = {
@@ -94,8 +95,8 @@ watch(searchQuery, (newQuery) => {
       class="absolute z-10 mt-2 w-full bg-[#15181b] border border-neutral-800 rounded-xl shadow-lg overflow-hidden"
     >
       <!-- Loading State -->
-      <div v-if="isLoading" class="p-4 text-center text-neutral-500">
-        Searching...
+      <div v-if="isLoading" class="p-4 flex justify-center">
+        <VueSpinnerDots :size="40" color="#22c55e" />
       </div>
 
       <!-- No Results -->

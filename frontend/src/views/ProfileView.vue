@@ -16,7 +16,7 @@
         <!-- Loading State -->
         <div v-if="isLoading" class="flex items-center justify-center p-20">
           <div class="text-center">
-            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500 mx-auto"></div>
+            <VueSpinnerOrbit :size="60" color="#22c55e" />
             <p class="text-neutral-500 mt-4">Loading profile...</p>
           </div>
         </div>
@@ -282,12 +282,13 @@
         <!-- Likes -->
         <div v-if="activeTab === 'Likes'">
           <!-- Loading State -->
-          <div v-if="isLoadingLikes" class="flex items-center justify-center p-20">
-            <div class="text-center">
-              <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-pink-500 mx-auto"></div>
-              <p class="text-neutral-500 mt-4">Loading liked posts...</p>
+                      <!-- Loading Likes -->
+            <div v-if="isLoadingLikes" class="flex items-center justify-center p-20">
+              <div class="text-center">
+                <VueSpinnerOrbit :size="60" color="#ec4899" />
+                <p class="text-neutral-500 mt-4">Loading liked posts...</p>
+              </div>
             </div>
-          </div>
 
           <!-- Liked Posts -->
           <div v-else-if="likedPosts.length > 0">
@@ -312,6 +313,7 @@
   import { onMounted, ref, computed, watch } from 'vue'
   import { useRoute } from 'vue-router'
   import { Camera } from 'lucide-vue-next'
+  import { VueSpinnerOrbit } from 'vue3-spinners'
   import PostCard from '@/components/Card.vue'
   import { userService } from '@/services/userService'
   import { authService } from '@/services/auth'
