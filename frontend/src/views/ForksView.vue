@@ -168,7 +168,10 @@
       // Fetch child posts (posts that forked from this one)
       try {
         const childrenData = await postService.getPostForks(postId)
-        childPosts.value = childrenData.map((child: any) => mapPostData(child, likedSet))
+        // Filter out deleted forks
+        childPosts.value = childrenData
+          .filter((child: any) => !child.deleted)
+          .map((child: any) => mapPostData(child, likedSet))
       } catch (err) {
         console.error('Failed to fetch forks:', err)
         childPosts.value = []
