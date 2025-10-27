@@ -20,24 +20,28 @@ const passport = require('./passport');
 connectDB();
 
 // Middleware
-const corsOrigin = 'https://forked-five.vercel.app/';
+const corsOrigin = process.env.FRONTEND_URL || "http://localhost:5173";
 
-app.use(cors({
-  origin: corsOrigin,
-  credentials: true
-}));
-app.use(express.json({ limit: '10mb' })); // Increased limit for base64 images
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 24 * 60 * 60 * 1000,
-    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
-  }
-}));
+app.use(
+  cors({
+    origin: corsOrigin,
+    credentials: true,
+  })
+);
+
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "devsecret",
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === "production",
+      httpOnly: true,
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 24 * 60 * 60 * 1000,
+    },
+  })
+);
 app.use(passport.initialize());
 app.use(passport.session());
 
