@@ -8,11 +8,11 @@ router.get('/github', passport.authenticate('github', { scope: ['user:email'] })
 // GitHub OAuth callback
 router.get('/github/callback',
   passport.authenticate('github', { 
-    failureRedirect: 'http://localhost:5173/login?error=auth_failed' 
+    failureRedirect: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/login?error=auth_failed` 
   }),
   (req, res) => {
     // Successful authentication, redirect to frontend with success
-    res.redirect('http://localhost:5173/');
+    res.redirect(process.env.FRONTEND_URL || 'http://localhost:5173');
   }
 );
 
