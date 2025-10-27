@@ -5,10 +5,16 @@ import FollowView from '@/views/FollowView.vue'
 import NewPostView from '@/views/NewPostView.vue'
 import ForksView from '@/views/ForksView.vue'
 import ForkPostView from '@/views/ForkPostView.vue'
+import LoginView from '@/views/LoginView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    {
+      path: '/login',
+      name: 'login',
+      component: LoginView,
+    },
     {
       path: '/',
       name: 'home',

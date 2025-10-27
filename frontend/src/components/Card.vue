@@ -211,6 +211,18 @@ const confirmDelete = async () => {
 };
 
 const toggleLike = async () => {
+  // Check if user is authenticated
+  try {
+    const response = await authService.getCurrentUser();
+    if (!response.user) {
+      router.push('/login');
+      return;
+    }
+  } catch (error) {
+    router.push('/login');
+    return;
+  }
+
   try {
     if (props.post.liked) {
       const result = await unlikePost(props.post.id);
@@ -235,8 +247,18 @@ const goToPost = () => {
   router.push(`/${props.post.id}/forks`);
 };
 
-const goToFork = () => {
-  router.push(`/fork/${props.post.id}`);
+const goToFork = async () => {
+  // Check if user is authenticated
+  try {
+    const response = await authService.getCurrentUser();
+    if (!response.user) {
+      router.push('/login');
+      return;
+    }
+    router.push(`/fork/${props.post.id}`);
+  } catch (error) {
+    router.push('/login');
+  }
 };
 
 const copyPostLink = async () => {

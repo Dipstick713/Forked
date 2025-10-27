@@ -54,7 +54,7 @@
         <div v-if="childPosts.length" class="space-y-4 pl-8">
           <div class="text-xs text-neutral-500 mb-2 pl-6">Forked Posts ({{ childPosts.length }})</div>
           <div v-for="child in childPosts" :key="child.id" class="relative pl-6">
-            <div class="absolute left-0 top-0 h-full w-0.5 bg-neutral-700 rounded-full"></div>
+            <div class="absolute left-0 top-0 h-full w-0.5 bg-zinc-700 rounded-full"></div>
             <div class="bg-[#0e0f10] bg-opacity-70 backdrop-blur-sm rounded-xl border border-neutral-800 shadow-lg">
               <Card :post="child" :currentUserId="currentUserId" />
             </div>
