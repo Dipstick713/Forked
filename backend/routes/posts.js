@@ -15,15 +15,20 @@ const requireAuth = (req, res, next) => {
 // Get all posts (with optional pagination)
 router.get('/', async (req, res) => {
   try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 20;
-    const skip = (page - 1) * limit;
+    const page = parseInt(req.query.page);
+    const limit = parseInt(req.query.limit);
 
-    const posts = await Post.find()
+    let query = Post.find()
       .populate('author', 'username displayName avatarUrl')
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(limit);
+      .sort({ createdAt: -1 });
+
+    // Only apply pagination if both page and limit are provided
+    if (page && limit) {
+      const skip = (page - 1) * limit;
+      query = query.skip(skip).limit(limit);
+    }
+
+    const posts = await query;
 
     res.json(posts);
   } catch (error) {

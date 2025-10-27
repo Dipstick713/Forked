@@ -1,5 +1,18 @@
 FROM node:18
+
 WORKDIR /app
-COPY . .
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies
 RUN npm install
-CMD ["node", "src/app.js"]
+
+# Copy application files
+COPY . .
+
+# Expose port
+EXPOSE 3000
+
+# Start the application
+CMD ["node", "index.js"]
