@@ -91,9 +91,13 @@ router.post('/', requireAuth, async (req, res) => {
 
     const postData = {
       content,
-      author: req.user._id,
-      image
+      author: req.user._id
     };
+
+    // Add image if provided (should be base64 string)
+    if (image) {
+      postData.image = image;
+    }
 
     // Handle forkedFrom or parentId (they're the same thing)
     const parentPostId = forkedFrom || parentId;

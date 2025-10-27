@@ -55,12 +55,41 @@ export const postService = {
   // Create new post
   async createPost(postData) {
     try {
-      const response = await api.post('/api/posts', postData);
-      return response.data;
+      // If postData contains a file, convert to base64
+      if (postData.image instanceof File) {
+        const base64Image = await this.fileToBase64(postData.image);
+        const payload = {
+          content: postData.content,
+          image: base64Image
+        };
+        if (postData.forkedFrom) {
+          payload.forkedFrom = postData.forkedFrom;
+        }
+        if (postData.parentId) {
+          payload.parentId = postData.parentId;
+        }
+        
+        const response = await api.post('/api/posts', payload);
+        return response.data;
+      } else {
+        // Send as regular JSON if no file
+        const response = await api.post('/api/posts', postData);
+        return response.data;
+      }
     } catch (error) {
       console.error('Error creating post:', error);
       throw error;
     }
+  },
+
+  // Helper function to convert File to base64
+  fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = error => reject(error);
+    });
   },
 
   // Like/unlike post

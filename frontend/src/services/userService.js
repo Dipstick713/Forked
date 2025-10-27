@@ -68,11 +68,42 @@ export const userService = {
   // Update user profile
   async updateProfile(profileData) {
     try {
-      const response = await api.put('/api/users/profile', profileData);
-      return response.data;
+      // If profileData contains files, convert to base64
+      if (profileData.avatar instanceof File || profileData.banner instanceof File) {
+        const payload = {};
+        
+        if (profileData.displayName) payload.displayName = profileData.displayName;
+        if (profileData.bio) payload.bio = profileData.bio;
+        if (profileData.location) payload.location = profileData.location;
+        if (profileData.website) payload.website = profileData.website;
+        
+        if (profileData.avatar instanceof File) {
+          payload.avatarUrl = await this.fileToBase64(profileData.avatar);
+        }
+        if (profileData.banner instanceof File) {
+          payload.bannerUrl = await this.fileToBase64(profileData.banner);
+        }
+        
+        const response = await api.put('/api/users/profile', payload);
+        return response.data;
+      } else {
+        // Send as regular JSON if no files
+        const response = await api.put('/api/users/profile', profileData);
+        return response.data;
+      }
     } catch (error) {
       console.error('Error updating profile:', error);
       throw error;
     }
+  },
+
+  // Helper function to convert File to base64
+  fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = error => reject(error);
+    });
   }
 };

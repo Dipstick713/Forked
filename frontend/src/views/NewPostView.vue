@@ -85,14 +85,9 @@ const createPost = async () => {
       content: postContent.value.trim()
     }
     
-    // TODO: Handle image upload
-    // For now, we'll just send the post without image
-    // In the future, you'll need to upload the image to a storage service
-    // and include the URL in postData.image
-    
+    // Add image file if selected
     if (selectedFile.value) {
-      // Placeholder for image upload
-      // postData.image = await uploadImage(selectedFile.value)
+      postData.image = selectedFile.value
     }
     
     // Create post via API

@@ -5,6 +5,7 @@ const userSchema = new mongoose.Schema({
   username: String,
   displayName: String,
   avatarUrl: String,
+  bannerUrl: String,
   profileUrl: String,
   email: String,
   bio: String,

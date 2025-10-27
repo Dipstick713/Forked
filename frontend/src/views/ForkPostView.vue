@@ -125,9 +125,9 @@ const createFork = async () => {
       forkedFrom: originalPost.value.id
     }
     
-    // TODO: Handle image upload
+    // Add image file if selected
     if (selectedFile.value) {
-      // forkData.image = await uploadImage(selectedFile.value)
+      forkData.image = selectedFile.value
     }
     
     // Create fork via API

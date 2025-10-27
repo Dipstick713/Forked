@@ -40,6 +40,9 @@
             class="w-full h-full object-cover"
             alt="Cover photo"
           >
+          <div v-else class="w-full h-full flex items-center justify-center text-neutral-700">
+            <span class="text-sm">No banner image</span>
+          </div>
         </div>
   
         <!-- Profile Info -->
@@ -110,7 +113,7 @@
               <!-- Modal Body -->
               <div class="p-4 space-y-6">
                 <!-- Cover Photo Section -->
-                <div class="relative h-48 bg-neutral-800 rounded-lg overflow-hidden group cursor-pointer">
+                <div class="relative h-48 bg-neutral-800 rounded-lg overflow-hidden group cursor-pointer" @click="coverInput?.click()">
                   <img 
                     v-if="editForm.coverPhoto" 
                     :src="editForm.coverPhoto" 
@@ -125,11 +128,18 @@
                       <Camera :size="24" />
                     </div>
                   </div>
+                  <input 
+                    ref="coverInput"
+                    type="file" 
+                    accept="image/*" 
+                    class="hidden"
+                    @change="handleCoverChange"
+                  >
                 </div>
 
                 <!-- Avatar Section -->
                 <div class="relative -mt-20 ml-4 w-32 h-32">
-                  <div class="relative w-full h-full rounded-full border-4 border-[#0e0f10] bg-neutral-800 overflow-hidden group cursor-pointer">
+                  <div class="relative w-full h-full rounded-full border-4 border-[#0e0f10] bg-neutral-800 overflow-hidden group cursor-pointer" @click="avatarInput?.click()">
                     <img 
                       :src="editForm.avatar" 
                       class="w-full h-full object-cover"
@@ -140,6 +150,13 @@
                         <Camera :size="20" />
                       </div>
                     </div>
+                    <input 
+                      ref="avatarInput"
+                      type="file" 
+                      accept="image/*" 
+                      class="hidden"
+                      @change="handleAvatarChange"
+                    >
                   </div>
                 </div>
 
@@ -330,6 +347,8 @@
   const currentUser = ref<any>(null)
   const showEditModal = ref(false)
   const isSaving = ref(false)
+  const avatarInput = ref<HTMLInputElement>()
+  const coverInput = ref<HTMLInputElement>()
   
   const user = ref({
     _id: '',
@@ -351,7 +370,9 @@
     location: '',
     website: '',
     avatar: '',
-    coverPhoto: ''
+    coverPhoto: '',
+    avatarFile: null as File | null,
+    bannerFile: null as File | null
   })
   
   const posts = ref([])
@@ -430,7 +451,9 @@
           location: user.value.location,
           website: user.value.website,
           avatar: user.value.avatar,
-          coverPhoto: user.value.coverPhoto
+          coverPhoto: user.value.coverPhoto,
+          avatarFile: null,
+          bannerFile: null
         }
       }
 
@@ -561,7 +584,9 @@
         location: user.value.location,
         website: user.value.website,
         avatar: user.value.avatar,
-        coverPhoto: user.value.coverPhoto
+        coverPhoto: user.value.coverPhoto,
+        avatarFile: null,
+        bannerFile: null
       }
     }
   })
@@ -602,19 +627,32 @@
     error.value = null
 
     try {
-      // Update user profile via API
-      const updatedData = await userService.updateProfile({
+      // Prepare profile data
+      const profileData: any = {
         displayName: editForm.value.name,
         bio: editForm.value.bio,
         location: editForm.value.location,
         website: editForm.value.website
-      })
+      }
+
+      // Add files if selected
+      if (editForm.value.avatarFile) {
+        profileData.avatar = editForm.value.avatarFile
+      }
+      if (editForm.value.bannerFile) {
+        profileData.banner = editForm.value.bannerFile
+      }
+
+      // Update user profile via API
+      const updatedData = await userService.updateProfile(profileData)
 
       // Update local user data
       user.value.name = editForm.value.name
       user.value.bio = editForm.value.bio
       user.value.location = editForm.value.location
       user.value.website = editForm.value.website
+      if (updatedData.avatarUrl) user.value.avatar = updatedData.avatarUrl
+      if (updatedData.bannerUrl) user.value.coverPhoto = updatedData.bannerUrl
 
       // Close modal
       showEditModal.value = false
@@ -624,6 +662,26 @@
       error.value = 'Failed to update profile'
     } finally {
       isSaving.value = false
+    }
+  }
+
+  // Handle avatar file selection
+  const handleAvatarChange = (e: Event) => {
+    const input = e.target as HTMLInputElement
+    if (input.files && input.files[0]) {
+      const file = input.files[0]
+      editForm.value.avatarFile = file
+      editForm.value.avatar = URL.createObjectURL(file)
+    }
+  }
+
+  // Handle cover/banner file selection
+  const handleCoverChange = (e: Event) => {
+    const input = e.target as HTMLInputElement
+    if (input.files && input.files[0]) {
+      const file = input.files[0]
+      editForm.value.bannerFile = file
+      editForm.value.coverPhoto = URL.createObjectURL(file)
     }
   }
 
