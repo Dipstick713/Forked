@@ -2,8 +2,12 @@
   <!-- Central scrollable content -->
   <div class="flex flex-col w-full max-w-[600px] border-x border-neutral-800 h-screen overflow-hidden">
     <!-- Fixed header -->
-    <div class="sticky top-0 z-10 bg-[#0e0f10] p-4 border-b border-neutral-800">
-      <h1 class="text-xl font-bold">Home</h1>
+    <div class="sticky top-0 z-10 bg-[#0e0f10] p-4 border-b border-neutral-800 flex items-center gap-3">
+      <MobileMenuButton @toggle="$emit('toggleSidebar')"/>
+      <h1 class="text-xl font-bold hidden sm:block">Home</h1>
+      <div class="flex-1 lg:hidden">
+        <SearchBar />
+      </div>
     </div>
       
       <!-- Scrollable posts container -->
@@ -51,9 +55,13 @@
 import { ref, onMounted } from 'vue'
 import { VueSpinnerOrbit } from 'vue3-spinners'
 import Card from '@/components/Card.vue'
+import MobileMenuButton from '@/components/MobileMenuButton.vue'
+import SearchBar from '@/components/SearchBar.vue'
 import { postService } from '@/services/postService'
 import { authService } from '@/services/auth'
 import { getUserLikedPosts } from '@/services/likeService'
+
+defineEmits(['toggleSidebar'])
 
 const posts = ref([])
 const currentUserId = ref<string>('')

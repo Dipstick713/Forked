@@ -1,11 +1,15 @@
 <template>
     <div class="flex flex-col w-full max-w-[600px] border-x border-neutral-800 h-screen overflow-hidden">
       <!-- Header -->
-      <div class="sticky top-0 z-10 bg-[#0e0f10] p-4 border-b border-neutral-800 flex items-center">
-        <button @click="goBack" class="mr-4">
+      <div class="sticky top-0 z-10 bg-[#0e0f10] p-4 border-b border-neutral-800 flex items-center gap-3">
+        <MobileMenuButton @toggle="$emit('toggleSidebar')"/>
+        <button @click="goBack" class="hover:bg-neutral-800 rounded-full p-1 transition-colors">
           <ArrowLeft :size="20" />
         </button>
-        <h1 class="text-xl font-bold">Fork Thread</h1>
+        <h1 class="text-xl font-bold hidden sm:block">Fork Thread</h1>
+        <div class="flex-1 lg:hidden">
+          <SearchBar />
+        </div>
       </div>
 
       <!-- Loading State -->
@@ -84,9 +88,13 @@
   import { ArrowLeft } from 'lucide-vue-next'
   import { VueSpinnerOrbit } from 'vue3-spinners'
   import Card from '@/components/Card.vue'
+  import MobileMenuButton from '@/components/MobileMenuButton.vue'
+  import SearchBar from '@/components/SearchBar.vue'
   import { postService } from '@/services/postService'
   import { authService } from '@/services/auth'
   import { getUserLikedPosts } from '@/services/likeService'
+
+  defineEmits(['toggleSidebar'])
 
   const router = useRouter()
   const route = useRoute()
