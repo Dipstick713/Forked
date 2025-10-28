@@ -15,6 +15,8 @@ export const authService = {
       return data;
     } catch (error) {
       console.error('Error fetching user:', error);
+      // Remove invalid token
+      localStorage.removeItem('forked_auth_token');
       return { user: null };
     }
   },
@@ -22,10 +24,14 @@ export const authService = {
   // Logout
   async logout() {
     try {
-      await api.get('/auth/logout');
+      await api.post('/auth/logout');
+      // Remove token from localStorage
+      localStorage.removeItem('forked_auth_token');
       return true;
     } catch (error) {
       console.error('Logout failed:', error);
+      // Still remove token even if server call fails
+      localStorage.removeItem('forked_auth_token');
       return false;
     }
   }

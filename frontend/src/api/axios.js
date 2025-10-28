@@ -1,14 +1,26 @@
 const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
+// Get token from localStorage
+const getToken = () => {
+  return localStorage.getItem('forked_auth_token');
+};
+
 const api = {
   async get(endpoint) {
     try {
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+      
+      const token = getToken();
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
       const response = await fetch(`${API_BASE}${endpoint}`, {
         method: 'GET',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
       });
       
       if (!response.ok) {
@@ -25,12 +37,19 @@ const api = {
 
   async post(endpoint, data) {
     try {
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+      
+      const token = getToken();
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
       const response = await fetch(`${API_BASE}${endpoint}`, {
         method: 'POST',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify(data),
       });
       
@@ -48,12 +67,19 @@ const api = {
 
   async put(endpoint, data) {
     try {
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+      
+      const token = getToken();
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
       const response = await fetch(`${API_BASE}${endpoint}`, {
         method: 'PUT',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
         body: JSON.stringify(data),
       });
       
@@ -71,12 +97,19 @@ const api = {
 
   async delete(endpoint) {
     try {
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+      
+      const token = getToken();
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      
       const response = await fetch(`${API_BASE}${endpoint}`, {
         method: 'DELETE',
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers,
       });
       
       if (!response.ok) {
