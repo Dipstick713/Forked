@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router';
-import { ref } from 'vue';
+import { RouterView, useRouter, useRoute } from 'vue-router';
+import { ref, onMounted } from 'vue';
 import Sidebar from '@/components/Sidebar.vue';
 import RightPanel from '@/components/RightPanel.vue';
+import api from '@/api/axios';
 
 const isSidebarOpen = ref(false);
+const router = useRouter();
+const route = useRoute();
 
 const toggleSidebar = () => {
   isSidebarOpen.value = !isSidebarOpen.value;
@@ -13,6 +16,28 @@ const toggleSidebar = () => {
 const closeSidebar = () => {
   isSidebarOpen.value = false;
 };
+
+// Handle OAuth callback with token
+onMounted(async () => {
+  const authToken = route.query.auth_token as string;
+  
+  if (authToken) {
+    try {
+      console.log('Exchanging auth token...');
+      await api.post('/auth/exchange-token', { token: authToken });
+      console.log('Token exchanged successfully');
+      
+      // Remove token from URL
+      router.replace({ query: {} });
+      
+      // Reload to fetch user data
+      window.location.reload();
+    } catch (error) {
+      console.error('Token exchange failed:', error);
+      router.push('/login?error=token_exchange_failed');
+    }
+  }
+});
 </script>
 
 <template>
