@@ -11,8 +11,15 @@ router.get('/github/callback',
     failureRedirect: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/login?error=auth_failed` 
   }),
   (req, res) => {
-    // Successful authentication, redirect to frontend with success
-    res.redirect(process.env.FRONTEND_URL || 'http://localhost:5173');
+    // Save session before redirect to ensure it's persisted
+    req.session.save((err) => {
+      if (err) {
+        console.error('Session save error:', err);
+        return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/login?error=session_failed`);
+      }
+      // Successful authentication, redirect to frontend with success
+      res.redirect(process.env.FRONTEND_URL || 'http://localhost:5173');
+    });
   }
 );
 

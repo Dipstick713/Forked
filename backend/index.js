@@ -28,6 +28,9 @@ app.use(
   cors({
     origin: corsOrigin,
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    exposedHeaders: ['set-cookie'],
   })
 );
 
@@ -43,11 +46,13 @@ app.use(
       mongoUrl: process.env.MONGO_URI,
       touchAfter: 24 * 3600 // lazy session update
     }),
+    name: 'forked.sid', // Custom cookie name
     cookie: {
       secure: process.env.NODE_ENV === "production",
       httpOnly: true,
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 24 * 60 * 60 * 1000,
+      domain: process.env.NODE_ENV === "production" ? undefined : undefined, // Let browser handle domain
     },
   })
 );
