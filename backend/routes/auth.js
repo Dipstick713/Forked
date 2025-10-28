@@ -15,10 +15,6 @@ router.get('/github/callback',
     failureRedirect: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/login?error=auth_failed` 
   }),
   (req, res) => {
-    console.log('=== GitHub callback successful ===');
-    console.log('User authenticated:', req.user.username);
-    console.log('Session ID:', req.sessionID);
-    
     // Generate temporary token
     const token = crypto.randomBytes(32).toString('hex');
     tempTokens.set(token, {
@@ -40,7 +36,6 @@ router.get('/github/callback',
         console.error('Session save error:', err);
         return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/login?error=session_failed`);
       }
-      console.log('Session saved, redirecting with token');
       // Redirect to frontend with token
       res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}?auth_token=${token}`);
     });
@@ -79,24 +74,12 @@ router.post('/exchange-token', (req, res) => {
       return res.status(500).json({ error: 'Session save failed' });
     }
     
-    console.log('Token exchanged, session established for user:', tokenData.userId);
     res.json({ success: true });
   });
 });
 
-// Logout
-
-
 // Get current user
 router.get('/user', (req, res) => {
-  console.log('=== /auth/user request ===');
-  console.log('Headers:', JSON.stringify(req.headers, null, 2));
-  console.log('Session ID:', req.sessionID);
-  console.log('Session:', JSON.stringify(req.session, null, 2));
-  console.log('Is Authenticated:', req.isAuthenticated());
-  console.log('User:', req.user);
-  console.log('Cookies:', req.headers.cookie);
-  
   if (req.isAuthenticated()) {
     res.json({
       user: {
@@ -109,7 +92,6 @@ router.get('/user', (req, res) => {
       }
     });
   } else {
-    console.log('User not authenticated - sending 401');
     res.status(401).json({ user: null });
   }
 });
