@@ -20,11 +20,7 @@ const passport = require('./passport');
 // Connect to database
 connectDB();
 
-// Trust proxy - CRITICAL for production (Render, Heroku, etc.)
-if (process.env.NODE_ENV === 'production') {
-  app.set('trust proxy', 1);
-}
-
+app.set('trust proxy', 1);
 // Middleware
 const corsOrigin = process.env.FRONTEND_URL || "http://localhost:5173";
 
@@ -34,6 +30,9 @@ app.use(
     credentials: true,
   })
 );
+
+app.use(express.json({ limit: '10mb' })); // Increased limit for base64 images
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 app.use(
   session({
