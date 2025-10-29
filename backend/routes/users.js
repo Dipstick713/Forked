@@ -1,6 +1,8 @@
 const express = require('express');
 const User = require('../models/User');
 const Post = require('../models/Post');
+const Follow = require('../models/Follow');
+const { authenticateJWT } = require('../middleware/jwt');
 const router = express.Router();
 
 // Search users by username or display name
@@ -84,19 +86,20 @@ router.get('/:id/posts', async (req, res) => {
 });
 
 // Get current user's profile (requires authentication)
-router.get('/profile/me', (req, res) => {
-  if (!req.isAuthenticated()) {
-    return res.status(401).json({ message: 'Not authenticated' });
+router.get('/profile/me', authenticateJWT, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).select('-__v');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
-  res.json(req.user);
 });
 
 // Update user profile (requires authentication)
-router.put('/profile', async (req, res) => {
-  if (!req.isAuthenticated()) {
-    return res.status(401).json({ message: 'Not authenticated' });
-  }
-
+router.put('/profile', authenticateJWT, async (req, res) => {
   try {
     const { displayName, bio, location, website, avatarUrl, bannerUrl } = req.body;
     
@@ -110,7 +113,7 @@ router.put('/profile', async (req, res) => {
     if (bannerUrl !== undefined) updateData.bannerUrl = bannerUrl;
 
     const updatedUser = await User.findByIdAndUpdate(
-      req.user._id,
+      req.userId,  // Changed from req.user._id
       updateData,
       { new: true, runValidators: true }
     ).select('-__v');

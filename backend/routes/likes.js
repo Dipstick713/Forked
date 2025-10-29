@@ -1,14 +1,7 @@
 const express = require('express');
 const Like = require('../models/Like');
+const { authenticateJWT } = require('../middleware/jwt');
 const router = express.Router();
-
-// Authentication middleware
-const requireAuth = (req, res, next) => {
-  if (!req.isAuthenticated()) {
-    return res.status(401).json({ message: 'Authentication required' });
-  }
-  next();
-};
 
 // Get all posts liked by a user
 router.get('/user/:userId', async (req, res) => {
@@ -32,7 +25,7 @@ router.get('/user/:userId', async (req, res) => {
 // Get all post IDs liked by the current user (lightweight for checking liked status)
 router.get('/my-likes', requireAuth, async (req, res) => {
   try {
-    const likes = await Like.find({ user: req.user._id }).select('post');
+    const likes = await Like.find({ user: req.userId }).select('post');
     const postIds = likes.map(like => like.post.toString());
     res.json(postIds);
   } catch (error) {

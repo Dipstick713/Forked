@@ -3,19 +3,20 @@ const router = express.Router();
 const Follow = require('../models/Follow');
 const User = require('../models/User');
 const Notification = require('../models/Notification');
+const { authenticateJWT, optionalJWT } = require('../middleware/jwt');
 
-// Middleware to check authentication
+// Middleware to check authentication (deprecated, using authenticateJWT directly)
 const isAuthenticated = (req, res, next) => {
-  if (req.isAuthenticated()) {
+  if (req.userId) {
     return next();
   }
   res.status(401).json({ error: 'Unauthorized' });
 };
 
 // Follow a user
-router.post('/:userId', isAuthenticated, async (req, res) => {
+router.post('/:userId', authenticateJWT, async (req, res) => {
   try {
-    const followerId = req.user._id;
+    const followerId = req.userId;  // Changed from req.userId
     const followingId = req.params.userId;
 
     // Can't follow yourself
@@ -66,9 +67,9 @@ router.post('/:userId', isAuthenticated, async (req, res) => {
 });
 
 // Unfollow a user
-router.delete('/:userId', isAuthenticated, async (req, res) => {
+router.delete('/:userId', authenticateJWT, async (req, res) => {
   try {
-    const followerId = req.user._id;
+    const followerId = req.userId;
     const followingId = req.params.userId;
 
     // Find and delete the follow relationship
@@ -110,9 +111,9 @@ router.get('/:userId/followers', async (req, res) => {
 
     // If authenticated, check which followers the current user is following
     let followingIds = [];
-    if (req.isAuthenticated()) {
+    if (req.userId) {
       const userFollowing = await Follow.find({ 
-        follower: req.user._id,
+        follower: req.userId,
         following: { $in: followers.map(f => f.follower._id) }
       }).select('following');
       followingIds = userFollowing.map(f => f.following.toString());
@@ -157,9 +158,9 @@ router.get('/:userId/following', async (req, res) => {
 
     // If authenticated, check which users the current user is following
     let followingIds = [];
-    if (req.isAuthenticated()) {
+    if (req.userId) {
       const userFollowing = await Follow.find({ 
-        follower: req.user._id,
+        follower: req.userId,
         following: { $in: following.map(f => f.following._id) }
       }).select('following');
       followingIds = userFollowing.map(f => f.following.toString());
@@ -187,9 +188,9 @@ router.get('/:userId/following', async (req, res) => {
 });
 
 // Check if user is following another user
-router.get('/check/:userId', isAuthenticated, async (req, res) => {
+router.get('/check/:userId', authenticateJWT, async (req, res) => {
   try {
-    const followerId = req.user._id;
+    const followerId = req.userId;
     const followingId = req.params.userId;
 
     const follow = await Follow.findOne({

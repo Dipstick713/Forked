@@ -2,11 +2,12 @@ const express = require('express');
 const Post = require('../models/Post');
 const Like = require('../models/Like');
 const Notification = require('../models/Notification');
+const { authenticateJWT, optionalJWT } = require('../middleware/jwt');
 const router = express.Router();
 
-// Authentication middleware
+// Authentication middleware (kept for backward compatibility, but we'll use JWT)
 const requireAuth = (req, res, next) => {
-  if (!req.isAuthenticated()) {
+  if (!req.userId) {
     return res.status(401).json({ message: 'Authentication required' });
   }
   next();
@@ -81,7 +82,7 @@ router.get('/:id/forks', async (req, res) => {
 });
 
 // Create a new post
-router.post('/', requireAuth, async (req, res) => {
+router.post('/', authenticateJWT, async (req, res) => {
   try {
     const { content, parentId, forkedFrom, image } = req.body;
 
@@ -96,7 +97,7 @@ router.post('/', requireAuth, async (req, res) => {
 
     const postData = {
       content,
-      author: req.user._id
+      author: req.userId  // Changed from req.user._id
     };
 
     // Add image if provided (should be base64 string)
@@ -134,10 +135,10 @@ router.post('/', requireAuth, async (req, res) => {
     // Create notification if it's a reply/fork
     if (parentPostId) {
       const parentPost = await Post.findById(parentPostId);
-      if (parentPost && parentPost.author.toString() !== req.user._id.toString()) {
+      if (parentPost && parentPost.author.toString() !== req.userId.toString()) {  // Changed from req.user._id
         await Notification.create({
           recipient: parentPost.author,
-          sender: req.user._id,
+          sender: req.userId,  // Changed from req.user._id
           type: 'fork',
           post: savedPost._id
         });
@@ -151,11 +152,11 @@ router.post('/', requireAuth, async (req, res) => {
 });
 
 // Like/unlike a post
-router.put('/:id/like', requireAuth, async (req, res) => {
+router.put('/:id/like', authenticateJWT, async (req, res) => {
   try {
     const { action } = req.body;
     const postId = req.params.id;
-    const userId = req.user._id;
+    const userId = req.userId;  // Changed from req.user._id
 
     if (action === 'like') {
       // Check if already liked
@@ -194,7 +195,7 @@ router.put('/:id/like', requireAuth, async (req, res) => {
 });
 
 // Delete a post
-router.delete('/:id', requireAuth, async (req, res) => {
+router.delete('/:id', authenticateJWT, async (req, res) => {
   try {
     const post = await Post.findById(req.params.id);
     
@@ -203,7 +204,7 @@ router.delete('/:id', requireAuth, async (req, res) => {
     }
 
     // Check if user owns the post
-    if (post.author.toString() !== req.user._id.toString()) {
+    if (post.author.toString() !== req.userId.toString()) {  // Changed from req.user._id
       return res.status(403).json({ message: 'Not authorized' });
     }
 

@@ -1,32 +1,25 @@
 const express = require('express');
 const router = express.Router();
 const Notification = require('../models/Notification');
-
-// Middleware to check authentication
-const isAuthenticated = (req, res, next) => {
-  if (req.isAuthenticated()) {
-    return next();
-  }
-  res.status(401).json({ error: 'Unauthorized' });
-};
+const { authenticateJWT } = require('../middleware/jwt');
 
 // Get user's notifications
-router.get('/', isAuthenticated, async (req, res) => {
+router.get('/', authenticateJWT, async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 20;
     const skip = (page - 1) * limit;
 
-    const notifications = await Notification.find({ recipient: req.user._id })
+    const notifications = await Notification.find({ recipient: req.userId })
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
       .populate('sender', 'username displayName avatarUrl')
       .populate('post', 'content');
 
-    const total = await Notification.countDocuments({ recipient: req.user._id });
+    const total = await Notification.countDocuments({ recipient: req.userId });
     const unreadCount = await Notification.countDocuments({ 
-      recipient: req.user._id, 
+      recipient: req.userId, 
       read: false 
     });
 
@@ -47,12 +40,12 @@ router.get('/', isAuthenticated, async (req, res) => {
 });
 
 // Mark notification as read
-router.put('/:notificationId/read', isAuthenticated, async (req, res) => {
+router.put('/:notificationId/read', authenticateJWT, async (req, res) => {
   try {
     const notification = await Notification.findOneAndUpdate(
       { 
         _id: req.params.notificationId,
-        recipient: req.user._id 
+        recipient: req.userId 
       },
       { read: true },
       { new: true }
@@ -70,10 +63,10 @@ router.put('/:notificationId/read', isAuthenticated, async (req, res) => {
 });
 
 // Mark all notifications as read
-router.put('/read-all', isAuthenticated, async (req, res) => {
+router.put('/read-all', authenticateJWT, async (req, res) => {
   try {
     await Notification.updateMany(
-      { recipient: req.user._id, read: false },
+      { recipient: req.userId, read: false },
       { read: true }
     );
 
@@ -85,11 +78,11 @@ router.put('/read-all', isAuthenticated, async (req, res) => {
 });
 
 // Delete a notification
-router.delete('/:notificationId', isAuthenticated, async (req, res) => {
+router.delete('/:notificationId', authenticateJWT, async (req, res) => {
   try {
     const notification = await Notification.findOneAndDelete({
       _id: req.params.notificationId,
-      recipient: req.user._id
+      recipient: req.userId
     });
 
     if (!notification) {
@@ -104,10 +97,10 @@ router.delete('/:notificationId', isAuthenticated, async (req, res) => {
 });
 
 // Get unread count
-router.get('/unread-count', isAuthenticated, async (req, res) => {
+router.get('/unread-count', authenticateJWT, async (req, res) => {
   try {
     const unreadCount = await Notification.countDocuments({
-      recipient: req.user._id,
+      recipient: req.userId,
       read: false
     });
 
