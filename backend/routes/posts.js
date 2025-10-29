@@ -5,14 +5,6 @@ const Notification = require('../models/Notification');
 const { authenticateJWT, optionalJWT } = require('../middleware/jwt');
 const router = express.Router();
 
-// Authentication middleware (kept for backward compatibility, but we'll use JWT)
-const requireAuth = (req, res, next) => {
-  if (!req.userId) {
-    return res.status(401).json({ message: 'Authentication required' });
-  }
-  next();
-};
-
 // Get all posts (with optional pagination)
 router.get('/', async (req, res) => {
   try {
