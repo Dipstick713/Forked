@@ -1,4 +1,4 @@
-# Forked 🍴
+# Forked
 
 A Git-inspired social media platform where developers can share posts, fork content, and engage with the community.
 

@@ -20,8 +20,17 @@ const closeSidebar = () => {
 // Handle OAuth callback with JWT token
 onMounted(async () => {
   const token = route.query.token as string;
+  const error = route.query.error as string;
+  
+  if (error) {
+    console.error('OAuth error:', error);
+    // Handle error - could show a toast notification
+    await router.replace({ query: {} });
+    return;
+  }
   
   if (token) {
+    console.log('Token received, storing...');
     // Store JWT token
     tokenStorage.setToken(token);
     
