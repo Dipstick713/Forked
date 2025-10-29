@@ -27,8 +27,6 @@ router.get('/github/callback',
   }),
   (req, res) => {
     try {
-      console.log('OAuth callback hit, user:', req.user);
-      
       if (!req.user) {
         console.error('No user in OAuth callback');
         return res.redirect(`${process.env.FRONTEND_URL || 'http://localhost:5173'}/login?error=no_user`);
@@ -36,11 +34,9 @@ router.get('/github/callback',
       
       // Generate JWT token
       const token = generateToken(req.user._id.toString());
-      console.log('Generated token for user:', req.user._id);
       
       // Redirect to frontend with JWT token
       const redirectUrl = `${process.env.FRONTEND_URL || 'http://localhost:5173'}?token=${token}`;
-      console.log('Redirecting to:', redirectUrl);
       res.redirect(redirectUrl);
     } catch (error) {
       console.error('OAuth callback error:', error);
