@@ -20,11 +20,15 @@ const api = {
         console.log(`[API GET ${endpoint}] No token available`);
       }
       
+      console.log(`[API GET ${endpoint}] Fetching from: ${API_BASE}${endpoint}`);
+      
       const response = await fetch(`${API_BASE}${endpoint}`, {
         method: 'GET',
         credentials: 'include',
         headers,
       });
+      
+      console.log(`[API GET ${endpoint}] Response status:`, response.status);
       
       if (!response.ok) {
         console.error(`[API GET ${endpoint}] Failed with status:`, response.status);
@@ -36,6 +40,8 @@ const api = {
       return response.json();
     } catch (error) {
       console.error(`[API GET ${endpoint}] Error:`, error);
+      console.error(`[API GET ${endpoint}] Error name:`, error.name);
+      console.error(`[API GET ${endpoint}] Error message:`, error.message);
       throw error;
     }
   },
