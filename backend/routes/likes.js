@@ -23,7 +23,7 @@ router.get('/user/:userId', async (req, res) => {
 });
 
 // Get all post IDs liked by the current user (lightweight for checking liked status)
-router.get('/my-likes', requireAuth, async (req, res) => {
+router.get('/my-likes', authenticateJWT, async (req, res) => {
   try {
     const likes = await Like.find({ user: req.userId }).select('post');
     const postIds = likes.map(like => like.post.toString());

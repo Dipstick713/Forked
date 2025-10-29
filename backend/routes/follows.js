@@ -5,14 +5,6 @@ const User = require('../models/User');
 const Notification = require('../models/Notification');
 const { authenticateJWT, optionalJWT } = require('../middleware/jwt');
 
-// Middleware to check authentication (deprecated, using authenticateJWT directly)
-const isAuthenticated = (req, res, next) => {
-  if (req.userId) {
-    return next();
-  }
-  res.status(401).json({ error: 'Unauthorized' });
-};
-
 // Follow a user
 router.post('/:userId', authenticateJWT, async (req, res) => {
   try {
