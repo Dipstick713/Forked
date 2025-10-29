@@ -19,26 +19,43 @@ const closeSidebar = () => {
 
 // Handle OAuth callback with JWT token
 onMounted(async () => {
+  console.log('App.vue mounted, checking for token/error in URL');
+  console.log('Current URL:', window.location.href);
+  console.log('Query params:', route.query);
+  
   const token = route.query.token as string;
   const error = route.query.error as string;
   
   if (error) {
-    console.error('OAuth error:', error);
+    console.error('OAuth error received:', error);
     // Handle error - could show a toast notification
     await router.replace({ query: {} });
     return;
   }
   
   if (token) {
-    console.log('Token received, storing...');
+    console.log('Token received from OAuth callback, length:', token.length);
+    console.log('Storing token in localStorage...');
+    
     // Store JWT token
     tokenStorage.setToken(token);
     
+    console.log('Token stored, verifying:', tokenStorage.hasToken());
+    
     // Remove token from URL
     await router.replace({ query: {} });
+    console.log('URL cleaned, redirecting to home...');
     
     // Redirect to home
     router.push('/');
+  } else {
+    console.log('No token or error in URL');
+    const existingToken = tokenStorage.getToken();
+    if (existingToken) {
+      console.log('Found existing token in localStorage');
+    } else {
+      console.log('No token in localStorage');
+    }
   }
 });
 </script>

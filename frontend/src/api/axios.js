@@ -14,7 +14,10 @@ const api = {
       
       const token = getToken();
       if (token) {
+        console.log(`[API GET ${endpoint}] Adding auth token to request`);
         headers['Authorization'] = `Bearer ${token}`;
+      } else {
+        console.log(`[API GET ${endpoint}] No token available`);
       }
       
       const response = await fetch(`${API_BASE}${endpoint}`, {
@@ -24,13 +27,15 @@ const api = {
       });
       
       if (!response.ok) {
+        console.error(`[API GET ${endpoint}] Failed with status:`, response.status);
         const error = await response.json().catch(() => ({ message: 'Request failed' }));
         throw new Error(error.message || `HTTP error! status: ${response.status}`);
       }
       
+      console.log(`[API GET ${endpoint}] Success`);
       return response.json();
     } catch (error) {
-      console.error('Fetch error:', error);
+      console.error(`[API GET ${endpoint}] Error:`, error);
       throw error;
     }
   },
