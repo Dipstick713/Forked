@@ -37,17 +37,21 @@ onMounted(async () => {
     console.log('Token received from OAuth callback, length:', token.length);
     console.log('Storing token in localStorage...');
     
-    // Store JWT token
+    // Store JWT token IMMEDIATELY and synchronously
     tokenStorage.setToken(token);
     
     console.log('Token stored, verifying:', tokenStorage.hasToken());
     
-    // Remove token from URL
-    await router.replace({ query: {} });
-    console.log('URL cleaned, redirecting to home...');
+    // Remove token from URL and redirect
+    // Use replace to change URL without navigation, then reload to ensure all components see the token
+    const url = new URL(window.location.href);
+    url.searchParams.delete('token');
+    window.history.replaceState({}, '', url.pathname + url.search);
     
-    // Redirect to home
-    router.push('/');
+    console.log('URL cleaned, reloading page to ensure token is available...');
+    
+    // Reload the page so all components mount with token already in localStorage
+    window.location.href = '/';
   } else {
     console.log('No token or error in URL');
     const existingToken = tokenStorage.getToken();
