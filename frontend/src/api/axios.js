@@ -14,13 +14,8 @@ const api = {
       
       const token = getToken();
       if (token) {
-        console.log(`[API GET ${endpoint}] Adding auth token to request`);
         headers['Authorization'] = `Bearer ${token}`;
-      } else {
-        console.log(`[API GET ${endpoint}] No token available`);
       }
-      
-      console.log(`[API GET ${endpoint}] Fetching from: ${API_BASE}${endpoint}`);
       
       const response = await fetch(`${API_BASE}${endpoint}`, {
         method: 'GET',
@@ -28,20 +23,14 @@ const api = {
         headers,
       });
       
-      console.log(`[API GET ${endpoint}] Response status:`, response.status);
-      
       if (!response.ok) {
-        console.error(`[API GET ${endpoint}] Failed with status:`, response.status);
         const error = await response.json().catch(() => ({ message: 'Request failed' }));
         throw new Error(error.message || `HTTP error! status: ${response.status}`);
       }
       
-      console.log(`[API GET ${endpoint}] Success`);
       return response.json();
     } catch (error) {
-      console.error(`[API GET ${endpoint}] Error:`, error);
-      console.error(`[API GET ${endpoint}] Error name:`, error.name);
-      console.error(`[API GET ${endpoint}] Error message:`, error.message);
+      console.error(`API Error (GET ${endpoint}):`, error.message);
       throw error;
     }
   },
@@ -54,13 +43,8 @@ const api = {
       
       const token = getToken();
       if (token) {
-        console.log(`[API POST ${endpoint}] Adding auth token to request`);
         headers['Authorization'] = `Bearer ${token}`;
-      } else {
-        console.log(`[API POST ${endpoint}] No token available`);
       }
-      
-      console.log(`[API POST ${endpoint}] Posting to: ${API_BASE}${endpoint}`);
       
       const response = await fetch(`${API_BASE}${endpoint}`, {
         method: 'POST',
@@ -69,18 +53,14 @@ const api = {
         body: JSON.stringify(data),
       });
       
-      console.log(`[API POST ${endpoint}] Response status:`, response.status);
-      
       if (!response.ok) {
-        console.error(`[API POST ${endpoint}] Failed with status:`, response.status);
         const error = await response.json().catch(() => ({ message: 'Request failed' }));
         throw new Error(error.message || `HTTP error! status: ${response.status}`);
       }
       
-      console.log(`[API POST ${endpoint}] Success`);
       return response.json();
     } catch (error) {
-      console.error(`[API POST ${endpoint}] Error:`, error);
+      console.error(`API Error (POST ${endpoint}):`, error.message);
       throw error;
     }
   },
@@ -93,13 +73,8 @@ const api = {
       
       const token = getToken();
       if (token) {
-        console.log(`[API PUT ${endpoint}] Adding auth token to request`);
         headers['Authorization'] = `Bearer ${token}`;
-      } else {
-        console.log(`[API PUT ${endpoint}] No token available`);
       }
-      
-      console.log(`[API PUT ${endpoint}] Sending to: ${API_BASE}${endpoint}`);
       
       const response = await fetch(`${API_BASE}${endpoint}`, {
         method: 'PUT',
@@ -108,18 +83,14 @@ const api = {
         body: JSON.stringify(data),
       });
       
-      console.log(`[API PUT ${endpoint}] Response status:`, response.status);
-      
       if (!response.ok) {
-        console.error(`[API PUT ${endpoint}] Failed with status:`, response.status);
         const error = await response.json().catch(() => ({ message: 'Request failed' }));
         throw new Error(error.message || `HTTP error! status: ${response.status}`);
       }
       
-      console.log(`[API PUT ${endpoint}] Success`);
       return response.json();
     } catch (error) {
-      console.error(`[API PUT ${endpoint}] Error:`, error);
+      console.error(`API Error (PUT ${endpoint}):`, error.message);
       throw error;
     }
   },
@@ -132,13 +103,8 @@ const api = {
       
       const token = getToken();
       if (token) {
-        console.log(`[API DELETE ${endpoint}] Adding auth token to request`);
         headers['Authorization'] = `Bearer ${token}`;
-      } else {
-        console.log(`[API DELETE ${endpoint}] No token available`);
       }
-      
-      console.log(`[API DELETE ${endpoint}] Deleting: ${API_BASE}${endpoint}`);
       
       const response = await fetch(`${API_BASE}${endpoint}`, {
         method: 'DELETE',
@@ -146,18 +112,14 @@ const api = {
         headers,
       });
       
-      console.log(`[API DELETE ${endpoint}] Response status:`, response.status);
-      
       if (!response.ok) {
-        console.error(`[API DELETE ${endpoint}] Failed with status:`, response.status);
         const error = await response.json().catch(() => ({ message: 'Request failed' }));
         throw new Error(error.message || `HTTP error! status: ${response.status}`);
       }
       
-      console.log(`[API DELETE ${endpoint}] Success`);
       return response.json();
     } catch (error) {
-      console.error(`[API DELETE ${endpoint}] Error:`, error);
+      console.error(`API Error (DELETE ${endpoint}):`, error.message);
       throw error;
     }
   },
