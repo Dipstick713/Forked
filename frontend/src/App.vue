@@ -37,21 +37,17 @@ onMounted(async () => {
     console.log('Token received from OAuth callback, length:', token.length);
     console.log('Storing token in localStorage...');
     
-    // Store JWT token IMMEDIATELY and synchronously
-    tokenStorage.setToken(token);
+    // Store JWT token directly using localStorage
+    localStorage.setItem('forked_auth_token', token);
     
-    console.log('Token stored, verifying:', tokenStorage.hasToken());
+    // Verify storage
+    const storedToken = localStorage.getItem('forked_auth_token');
+    console.log('Token stored successfully:', !!storedToken);
+    console.log('Stored token matches:', storedToken === token);
     
-    // Remove token from URL and redirect
-    // Use replace to change URL without navigation, then reload to ensure all components see the token
-    const url = new URL(window.location.href);
-    url.searchParams.delete('token');
-    window.history.replaceState({}, '', url.pathname + url.search);
-    
-    console.log('URL cleaned, reloading page to ensure token is available...');
-    
-    // Reload the page so all components mount with token already in localStorage
-    window.location.href = '/';
+    // Clean URL and force reload
+    console.log('Redirecting to home with reload...');
+    window.location.replace('/');
   } else {
     console.log('No token or error in URL');
     const existingToken = tokenStorage.getToken();
